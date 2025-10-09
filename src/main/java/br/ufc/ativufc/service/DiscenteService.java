@@ -7,6 +7,9 @@ import br.ufc.ativufc.model.Perfil;
 import br.ufc.ativufc.repository.DiscenteRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class DiscenteService {
     private final DiscenteRepository repository;
@@ -27,10 +30,37 @@ public class DiscenteService {
 
         repository.save(discente);
 
+        return toResponse(discente);
+    }
+
+    public List<DiscenteResponse> listarTodos() {
+        return repository.findAll().stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    public DiscenteResponse buscarPorMatricula(String matricula) {
+        Discente discente = repository.findByMatricula(matricula).get();
+        return toResponse(discente);
+    }
+
+    public DiscenteResponse atualizar(String matricula, DiscenteRequest request) {
+        Discente discente = repository.findByMatricula(matricula).get();
+
+        discente.setNome(request.nome());
+        discente.setSenha(request.senha());
+
+        repository.save(discente);
+
+        return toResponse(discente);
+    }
+
+    private DiscenteResponse toResponse(Discente discente) {
         return new DiscenteResponse(
                 discente.getMatricula(),
                 discente.getNome(),
                 discente.getPerfil().name()
         );
     }
+
 }

@@ -20,6 +20,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/subtipo").permitAll()
                         .requestMatchers(HttpMethod.POST, "/instituicao").permitAll()
                         .requestMatchers(HttpMethod.POST, "/solicitacao").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/discentes").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/discentes/**").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/discentes/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .build();
