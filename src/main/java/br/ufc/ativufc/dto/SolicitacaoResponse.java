@@ -1,5 +1,7 @@
 package br.ufc.ativufc.dto;
 
+import br.ufc.ativufc.model.Status;
+
 import java.time.LocalDate;
 
 public record SolicitacaoResponse(
@@ -8,6 +10,7 @@ public record SolicitacaoResponse(
         String nomeInstituicao,
         String subtipoAtividade,
         Integer cargaHorariaTotal,
-        Boolean deferida,
-        LocalDate dataSolicitacao
-) { }
+        Status status,
+        LocalDate dataSolicitacao,
+        String observacaoResponsavel
+) {}

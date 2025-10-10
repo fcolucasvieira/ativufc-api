@@ -17,15 +17,20 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/discentes").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/subtipo").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/instituicao").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/solicitacao").permitAll()
-                        .requestMatchers(HttpMethod.GET,"/discentes").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/discentes").permitAll()
                         .requestMatchers(HttpMethod.GET, "/discentes/**").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/discentes/**").permitAll()
+
+                        .requestMatchers(HttpMethod.POST, "/subtipos").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/instituicoes").permitAll()
+
+                        .requestMatchers(HttpMethod.POST, "/solicitacoes").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/solicitacoes").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/solicitacoes/discente/**").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/solicitacoes/*/status").permitAll()
+
                         .anyRequest().authenticated()
                 )
                 .build();
     }
-
 }

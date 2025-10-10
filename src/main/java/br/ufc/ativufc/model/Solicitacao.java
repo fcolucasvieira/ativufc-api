@@ -1,5 +1,6 @@
 package br.ufc.ativufc.model;
 
+import br.ufc.ativufc.dto.SolicitacaoResponse;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,7 +13,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
-public class SolicitacaoCreditacaoAtividade {
+public class Solicitacao {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,8 +40,13 @@ public class SolicitacaoCreditacaoAtividade {
     @Column(nullable = false)
     private LocalDate dataSolicitacao = LocalDate.now();
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Boolean deferida = false;
+    private Status status = Status.PENDENTE;
 
+    @Column(length = 350)
     private String observacao;
+
+    @Column(length = 350)
+    private String observacaoResponsavel;
 }

@@ -28,5 +28,4 @@ public record SolicitacaoRequest(
 
         @NotBlank
         String observacao
-) {
-}
+) {}

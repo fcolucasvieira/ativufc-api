@@ -36,7 +36,7 @@ public class DiscenteService {
     public List<DiscenteResponse> listarTodos() {
         return repository.findAll().stream()
                 .map(this::toResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public DiscenteResponse buscarPorMatricula(String matricula) {
@@ -55,12 +55,11 @@ public class DiscenteService {
         return toResponse(discente);
     }
 
-    private DiscenteResponse toResponse(Discente discente) {
+    public DiscenteResponse toResponse(Discente discente){
         return new DiscenteResponse(
                 discente.getMatricula(),
                 discente.getNome(),
                 discente.getPerfil().name()
         );
     }
-
 }
