@@ -26,8 +26,11 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.POST, "/solicitacoes").permitAll()
                         .requestMatchers(HttpMethod.GET, "/solicitacoes").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/solicitacoes/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/solicitacoes/discente/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/solicitacoes/status").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/solicitacoes/*/status").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/solicitacoes/**").permitAll()
 
                         .anyRequest().authenticated()
                 )

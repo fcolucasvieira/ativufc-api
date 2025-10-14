@@ -4,10 +4,7 @@ import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
 
-public record SolicitacaoRequest(
-        @NotBlank
-        String matriculaDiscente,
-
+public record AtualizarSolicitacaoRequest(
         @NotNull
         Long idSubtipoAtividade,
 
@@ -28,4 +25,5 @@ public record SolicitacaoRequest(
 
         @NotBlank
         String observacao
-) {}
+) {
+}
