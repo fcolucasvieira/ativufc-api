@@ -6,6 +6,8 @@ import br.ufc.ativufc.model.SubtipoAtividade;
 import br.ufc.ativufc.repository.SubtipoRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class SubtipoService {
     private final SubtipoRepository repository;
@@ -22,6 +24,23 @@ public class SubtipoService {
 
         repository.save(subtipo);
 
+        return toResponse(subtipo);
+    }
+
+    public SubtipoResponse buscarPorId(Long id) {
+        return repository.findById(id)
+                .map(this::toResponse)
+                .orElse(null);
+    }
+
+
+    public List<SubtipoResponse> listarTodos() {
+        return repository.findAll().stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    public SubtipoResponse toResponse(SubtipoAtividade subtipo) {
         return new SubtipoResponse(
                 subtipo.getId(),
                 subtipo.getDescricaoSubTipoAtividade(),

@@ -6,6 +6,8 @@ import br.ufc.ativufc.model.Instituicao;
 import br.ufc.ativufc.repository.InstituicaoRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class InstituicaoService {
     private final InstituicaoRepository repository;
@@ -24,6 +26,22 @@ public class InstituicaoService {
 
         repository.save(instituicao);
 
+        return toResponse(instituicao);
+    }
+
+    public InstituicaoResponse buscarPorId(Long id){
+        return repository.findById(id)
+                .map(this::toResponse)
+                .orElse(null);
+    }
+
+    public List<InstituicaoResponse> listarTodos(){
+        return repository.findAll().stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    public InstituicaoResponse toResponse(Instituicao instituicao) {
         return new InstituicaoResponse(
                 instituicao.getId(),
                 instituicao.getNome(),
@@ -31,4 +49,5 @@ public class InstituicaoService {
                 instituicao.getEndereco()
         );
     }
+
 }

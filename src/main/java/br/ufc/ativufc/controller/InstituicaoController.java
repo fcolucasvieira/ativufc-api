@@ -5,10 +5,9 @@ import br.ufc.ativufc.dto.InstituicaoResponse;
 import br.ufc.ativufc.service.InstituicaoService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/instituicoes")
@@ -23,5 +22,22 @@ public class InstituicaoController {
     public ResponseEntity<InstituicaoResponse> cadastrar(@Valid @RequestBody InstituicaoRequest request) {
         InstituicaoResponse response = service.cadastrar(request);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<InstituicaoResponse> buscarPorId(@PathVariable Long id) {
+        InstituicaoResponse response = service.buscarPorId(id);
+
+        if (response == null)
+            return ResponseEntity.notFound().build();
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<InstituicaoResponse>> listarTodos(){
+        List<InstituicaoResponse> lista = service.listarTodos();
+
+        return ResponseEntity.ok(lista);
     }
 }

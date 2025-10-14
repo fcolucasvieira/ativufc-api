@@ -24,16 +24,16 @@ public class DiscenteController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping
-    public ResponseEntity<List<DiscenteResponse>> listarTodos() {
-        List<DiscenteResponse> lista = service.listarTodos();
-        return ResponseEntity.ok(lista);
-    }
-
     @GetMapping("/{matricula}")
     public ResponseEntity<DiscenteResponse> buscarPorMatricula(@PathVariable String matricula) {
         DiscenteResponse response = service.buscarPorMatricula(matricula);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<DiscenteResponse>> listarTodos() {
+        List<DiscenteResponse> lista = service.listarTodos();
+        return ResponseEntity.ok(lista);
     }
 
     @PutMapping("/{matricula}")

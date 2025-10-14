@@ -80,6 +80,7 @@ public class SolicitacaoService {
                 .toList();
     }
 
+    // Simplificar metodo (Atualizações futuras)
     public SolicitacaoResponse atualizar(Long id, AtualizarSolicitacaoRequest request){
         Solicitacao solicitacao = solicitacaoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Solicitação não encontrada"));

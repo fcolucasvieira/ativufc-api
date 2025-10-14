@@ -33,15 +33,15 @@ public class DiscenteService {
         return toResponse(discente);
     }
 
+    public DiscenteResponse buscarPorMatricula(String matricula) {
+        Discente discente = repository.findByMatricula(matricula).get();
+        return toResponse(discente);
+    }
+
     public List<DiscenteResponse> listarTodos() {
         return repository.findAll().stream()
                 .map(this::toResponse)
                 .toList();
-    }
-
-    public DiscenteResponse buscarPorMatricula(String matricula) {
-        Discente discente = repository.findByMatricula(matricula).get();
-        return toResponse(discente);
     }
 
     public DiscenteResponse atualizar(String matricula, DiscenteRequest request) {

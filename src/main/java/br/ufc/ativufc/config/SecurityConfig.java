@@ -22,7 +22,12 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/discentes/**").permitAll()
 
                         .requestMatchers(HttpMethod.POST, "/subtipos").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/subtipos").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/subtipos/**").permitAll()
+
                         .requestMatchers(HttpMethod.POST, "/instituicoes").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/instituicoes").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/instituicoes/**").permitAll()
 
                         .requestMatchers(HttpMethod.POST, "/solicitacoes").permitAll()
                         .requestMatchers(HttpMethod.GET, "/solicitacoes").permitAll()
