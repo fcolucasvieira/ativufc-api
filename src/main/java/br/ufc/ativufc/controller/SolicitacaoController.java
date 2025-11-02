@@ -32,6 +32,10 @@ public class SolicitacaoController {
     @GetMapping("/{id}")
     public ResponseEntity<SolicitacaoResponse> buscarPorId(@PathVariable Long id) {
         SolicitacaoResponse response = service.buscarPorId(id);
+
+        if (response == null)
+            return ResponseEntity.notFound().build();
+
         return ResponseEntity.ok(response);
     }
 

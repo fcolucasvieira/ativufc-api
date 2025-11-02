@@ -27,6 +27,10 @@ public class DiscenteController {
     @GetMapping("/{matricula}")
     public ResponseEntity<DiscenteResponse> buscarPorMatricula(@PathVariable String matricula) {
         DiscenteResponse response = service.buscarPorMatricula(matricula);
+
+        if (response == null)
+            return ResponseEntity.notFound().build();
+
         return ResponseEntity.ok(response);
     }
 
