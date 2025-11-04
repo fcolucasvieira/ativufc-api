@@ -1,9 +1,7 @@
 package br.ufc.ativufc.model;
 
-
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.context.support.BeanDefinitionDsl;
 
 @Entity
 @Table(name = "usuarios")
@@ -12,7 +10,6 @@ import org.springframework.context.support.BeanDefinitionDsl;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
-
 public class Usuario {
 
     @Id
@@ -29,7 +26,7 @@ public class Usuario {
     private String senha;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "role", nullable = false)
+    @Column(name = "perfil", nullable = false)
     private Perfil perfil;
 
     @Column(name = "ativo", nullable = false)

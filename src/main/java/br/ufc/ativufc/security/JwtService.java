@@ -13,7 +13,7 @@ public class JwtService {
     @Value("${jwt.secret}")
     private String secretKey;
 
-    private final long expirationMs = 1000 * 60 * 60 * 4;
+    private final long expirationMs = 1000 * 60 * 60;
 
     public String gerarToken(String email) {
         return Jwts.builder()
