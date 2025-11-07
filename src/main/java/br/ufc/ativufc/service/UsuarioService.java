@@ -17,27 +17,27 @@ public class UsuarioService {
         this.repository = repository;
     }
 
-    public UsuarioResponse cadastrar(UsuarioRequest request){
+    public UsuarioResponse cadastrar(UsuarioRequest request) {
         Usuario usuario = new Usuario(
                 null,
                 request.nome(),
                 request.email(),
                 request.senha(),
                 request.perfil(),
-                request.ativo()
+                true
         );
 
         repository.save(usuario);
         return toResponse(usuario);
     }
 
-    public UsuarioResponse buscarPorId(Long id){
+    public UsuarioResponse buscarPorId(Long id) {
         return repository.findById(id)
                 .map(this::toResponse)
                 .orElse(null);
     }
 
-    public List<UsuarioResponse> listarTodos(){
+    public List<UsuarioResponse> listarTodos() {
         return repository.findAll().stream()
                 .map(this::toResponse)
                 .toList();
