@@ -4,6 +4,7 @@ import br.ufc.ativufc.dto.UsuarioRequest;
 import br.ufc.ativufc.dto.UsuarioResponse;
 import br.ufc.ativufc.model.Usuario;
 import br.ufc.ativufc.repository.UsuarioRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,9 +13,11 @@ import java.util.List;
 public class UsuarioService {
 
     private final UsuarioRepository repository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UsuarioService(UsuarioRepository repository) {
+    public UsuarioService(UsuarioRepository repository, PasswordEncoder passwordEncoder) {
         this.repository = repository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public UsuarioResponse cadastrar(UsuarioRequest request) {
@@ -22,7 +25,7 @@ public class UsuarioService {
                 null,
                 request.nome(),
                 request.email(),
-                request.senha(),
+                passwordEncoder.encode(request.senha()),
                 request.perfil(),
                 true
         );
