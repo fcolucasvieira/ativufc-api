@@ -1,7 +1,7 @@
 package br.ufc.ativufc.service;
 
-import br.ufc.ativufc.dto.SubtipoRequest;
-import br.ufc.ativufc.dto.SubtipoResponse;
+import br.ufc.ativufc.dto.request.SubtipoRequest;
+import br.ufc.ativufc.dto.response.SubtipoResponse;
 import br.ufc.ativufc.model.SubtipoAtividade;
 import br.ufc.ativufc.repository.SubtipoRepository;
 import org.springframework.stereotype.Service;

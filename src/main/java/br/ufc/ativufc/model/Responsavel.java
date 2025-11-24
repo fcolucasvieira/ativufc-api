@@ -3,29 +3,21 @@ package br.ufc.ativufc.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDate;
-
 @Entity
-@Table(name = "discentes")
+@Table(name = "responsaveis")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(of = "matricula")
-public class Discente {
+@EqualsAndHashCode(of = "cpf")
+public class Responsavel {
 
     @Id
     @Column(nullable = false, unique = true)
-    private String matricula;
+    private String cpf;
 
     @Column(nullable = false)
     private String nome;
-
-    @Column(nullable = false)
-    private LocalDate ingressao;
-
-    @Column(nullable = false)
-    private Integer totalHorasComplementares;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "usuario_id", nullable = false)

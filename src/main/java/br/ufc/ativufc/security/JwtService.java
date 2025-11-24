@@ -33,21 +33,27 @@ public class JwtService {
                 .compact();
     }
 
-    public String extrairEmail(String token) {
-        Claims claims = Jwts.parserBuilder()
+    private Claims extrairClaims(String token) {
+        return Jwts.parserBuilder()
                 .setSigningKey(secretKey)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
-        return claims.getSubject();
+    }
+
+    public String extrairEmail(String token) {
+        return extrairClaims(token).getSubject();
     }
 
     public String extrairPerfil(String token) {
-        Claims claims = Jwts.parserBuilder()
-                .setSigningKey(secretKey)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
-        return claims.get("perfil", String.class);
+        return extrairClaims(token).get("perfil", String.class);
+    }
+
+    public boolean isTokenValido(String token) {
+        try {
+            return extrairClaims(token).getExpiration().after(new Date());
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

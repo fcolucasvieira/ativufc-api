@@ -1,4 +1,4 @@
-package br.ufc.ativufc.dto;
+package br.ufc.ativufc.dto.request;
 
 import br.ufc.ativufc.model.Perfil;
 import jakarta.validation.constraints.Email;

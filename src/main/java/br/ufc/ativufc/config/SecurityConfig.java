@@ -20,10 +20,9 @@ public class SecurityConfig {
                 .headers(headers -> headers.frameOptions(frame -> frame.disable()))
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                // Libera cadastro e login, exige autenticação nas demais rotas
+                // Libera TODAS as rotas (fase de testes)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/usuarios/**").permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
 
                 .build();

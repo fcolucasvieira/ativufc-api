@@ -1,4 +1,4 @@
-package br.ufc.ativufc.dto;
+package br.ufc.ativufc.dto.response;
 
 import br.ufc.ativufc.model.Perfil;
 

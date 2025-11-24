@@ -1,65 +1,86 @@
 package br.ufc.ativufc.service;
 
-import br.ufc.ativufc.dto.DiscenteRequest;
-import br.ufc.ativufc.dto.DiscenteResponse;
+import br.ufc.ativufc.dto.request.DiscenteRequest;
+import br.ufc.ativufc.dto.response.DiscenteResponse;
 import br.ufc.ativufc.model.Discente;
 import br.ufc.ativufc.model.Perfil;
+import br.ufc.ativufc.model.Usuario;
 import br.ufc.ativufc.repository.DiscenteRepository;
+import br.ufc.ativufc.repository.UsuarioRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class DiscenteService {
-    private final DiscenteRepository repository;
 
-    public DiscenteService(DiscenteRepository repository) {
-        this.repository = repository;
+    private final DiscenteRepository discenteRepository;
+    private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    public DiscenteService(DiscenteRepository discenteRepository, UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
+        this.discenteRepository = discenteRepository;
+        this.usuarioRepository = usuarioRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public DiscenteResponse cadastrar(DiscenteRequest request) {
+        Usuario usuario = new Usuario(
+                null,
+                request.nome(),
+                request.email(),
+                passwordEncoder.encode(request.senha()),
+                Perfil.DISCENTE,
+                true,
+                null,
+                null
+        );
+
         Discente discente = new Discente(
                 request.matricula(),
                 request.nome(),
-                java.time.LocalDate.now(),
-                0,
-                request.senha(),
-                Perfil.DISCENTE
+                request.ingressao(),
+                request.totalHorasComplementares(),
+                usuario
         );
 
-        repository.save(discente);
+        discenteRepository.save(discente);
 
         return toResponse(discente);
     }
 
     public DiscenteResponse buscarPorMatricula(String matricula) {
-        Discente discente = repository.findByMatricula(matricula).get();
+        Discente discente = discenteRepository.findByMatricula(matricula).get();
         return toResponse(discente);
     }
 
     public List<DiscenteResponse> listarTodos() {
-        return repository.findAll().stream()
+        return discenteRepository.findAll().stream()
                 .map(this::toResponse)
                 .toList();
     }
 
     public DiscenteResponse atualizar(String matricula, DiscenteRequest request) {
-        Discente discente = repository.findByMatricula(matricula).get();
+        Discente discente = discenteRepository.findByMatricula(matricula).get();
 
         discente.setNome(request.nome());
-        discente.setSenha(request.senha());
+        discente.setIngressao(request.ingressao());
+        discente.setTotalHorasComplementares(request.totalHorasComplementares());
 
-        repository.save(discente);
+        discenteRepository.save(discente);
 
         return toResponse(discente);
     }
 
-    public DiscenteResponse toResponse(Discente discente){
+    public DiscenteResponse toResponse(Discente discente) {
         return new DiscenteResponse(
                 discente.getMatricula(),
                 discente.getNome(),
-                discente.getPerfil().name()
+                discente.getUsuario().getEmail(),
+                discente.getIngressao(),
+                discente.getTotalHorasComplementares()
         );
     }
 }

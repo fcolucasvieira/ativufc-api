@@ -1,0 +1,44 @@
+package br.ufc.ativufc.controller;
+
+import br.ufc.ativufc.dto.request.ResponsavelRequest;
+import br.ufc.ativufc.dto.response.ResponsavelResponse;
+import br.ufc.ativufc.service.ResponsavelService;
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/responsaveis")
+public class ResponsavelController {
+    private final ResponsavelService service;
+
+    public ResponsavelController(ResponsavelService service) {
+        this.service = service;
+    }
+
+    @PostMapping
+    public ResponseEntity<ResponsavelResponse> cadastrar(@Valid @RequestBody ResponsavelRequest request) {
+        ResponsavelResponse response = service.cadastrar(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{cpf}")
+    public ResponseEntity<ResponsavelResponse> buscarPorCpf(@PathVariable String cpf){
+        ResponsavelResponse response = service.buscarPorCpf(cpf);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ResponsavelResponse>> listarTodos(){
+        List<ResponsavelResponse> lista = service.listarTodos();
+        return ResponseEntity.ok(lista);
+    }
+
+    @PutMapping("/{cpf}")
+    public ResponseEntity<ResponsavelResponse> atualizar(@PathVariable String cpf, @Valid @RequestBody ResponsavelRequest request){
+        ResponsavelResponse response = service.atualizar(cpf, request);
+        return ResponseEntity.ok(response);
+    }
+}

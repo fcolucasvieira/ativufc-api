@@ -1,7 +1,7 @@
 package br.ufc.ativufc.controller;
 
-import br.ufc.ativufc.dto.InstituicaoRequest;
-import br.ufc.ativufc.dto.InstituicaoResponse;
+import br.ufc.ativufc.dto.request.InstituicaoRequest;
+import br.ufc.ativufc.dto.response.InstituicaoResponse;
 import br.ufc.ativufc.service.InstituicaoService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;

@@ -1,7 +1,7 @@
 package br.ufc.ativufc.service;
 
-import br.ufc.ativufc.dto.InstituicaoRequest;
-import br.ufc.ativufc.dto.InstituicaoResponse;
+import br.ufc.ativufc.dto.request.InstituicaoRequest;
+import br.ufc.ativufc.dto.response.InstituicaoResponse;
 import br.ufc.ativufc.model.Instituicao;
 import br.ufc.ativufc.repository.InstituicaoRepository;
 import org.springframework.stereotype.Service;

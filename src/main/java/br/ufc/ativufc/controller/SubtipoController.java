@@ -1,8 +1,7 @@
 package br.ufc.ativufc.controller;
 
-import br.ufc.ativufc.dto.SubtipoRequest;
-import br.ufc.ativufc.dto.SubtipoResponse;
-import br.ufc.ativufc.model.SubtipoAtividade;
+import br.ufc.ativufc.dto.request.SubtipoRequest;
+import br.ufc.ativufc.dto.response.SubtipoResponse;
 import br.ufc.ativufc.service.SubtipoService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;

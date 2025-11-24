@@ -1,7 +1,7 @@
 package br.ufc.ativufc.service;
 
-import br.ufc.ativufc.dto.UsuarioRequest;
-import br.ufc.ativufc.dto.UsuarioResponse;
+import br.ufc.ativufc.dto.request.UsuarioRequest;
+import br.ufc.ativufc.dto.response.UsuarioResponse;
 import br.ufc.ativufc.model.Usuario;
 import br.ufc.ativufc.repository.UsuarioRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,10 +27,13 @@ public class UsuarioService {
                 request.email(),
                 passwordEncoder.encode(request.senha()),
                 request.perfil(),
-                true
+                true,
+                null,
+                null
         );
 
         repository.save(usuario);
+
         return toResponse(usuario);
     }
 

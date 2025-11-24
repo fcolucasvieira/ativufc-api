@@ -1,4 +1,4 @@
-package br.ufc.ativufc.dto;
+package br.ufc.ativufc.dto.response;
 
 public record SubtipoResponse(
     Long id,

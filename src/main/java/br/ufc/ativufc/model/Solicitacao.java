@@ -1,6 +1,5 @@
 package br.ufc.ativufc.model;
 
-import br.ufc.ativufc.dto.SolicitacaoResponse;
 import jakarta.persistence.*;
 import lombok.*;
 

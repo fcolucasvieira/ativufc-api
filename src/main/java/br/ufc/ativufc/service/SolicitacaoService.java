@@ -1,12 +1,14 @@
 package br.ufc.ativufc.service;
 
-import br.ufc.ativufc.dto.*;
+import br.ufc.ativufc.dto.request.AtualizarSolicitacaoRequest;
+import br.ufc.ativufc.dto.request.SolicitacaoRequest;
+import br.ufc.ativufc.dto.request.StatusRequest;
+import br.ufc.ativufc.dto.response.SolicitacaoResponse;
 import br.ufc.ativufc.model.*;
 import br.ufc.ativufc.repository.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class SolicitacaoService {

@@ -1,13 +1,10 @@
 package br.ufc.ativufc.controller;
 
-import br.ufc.ativufc.dto.AtualizarSolicitacaoRequest;
-import br.ufc.ativufc.dto.SolicitacaoRequest;
-import br.ufc.ativufc.dto.SolicitacaoResponse;
-import br.ufc.ativufc.dto.StatusRequest;
-import br.ufc.ativufc.model.Instituicao;
-import br.ufc.ativufc.model.Solicitacao;
+import br.ufc.ativufc.dto.request.AtualizarSolicitacaoRequest;
+import br.ufc.ativufc.dto.request.SolicitacaoRequest;
+import br.ufc.ativufc.dto.response.SolicitacaoResponse;
+import br.ufc.ativufc.dto.request.StatusRequest;
 import br.ufc.ativufc.model.Status;
-import br.ufc.ativufc.model.SubtipoAtividade;
 import br.ufc.ativufc.service.SolicitacaoService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;

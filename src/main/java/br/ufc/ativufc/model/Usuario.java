@@ -31,4 +31,10 @@ public class Usuario {
 
     @Column(name = "ativo", nullable = false)
     private boolean ativo;
+
+    @OneToOne(mappedBy = "usuario")
+    private Discente discente;
+
+    @OneToOne(mappedBy = "usuario")
+    private Responsavel responsavel;
 }
