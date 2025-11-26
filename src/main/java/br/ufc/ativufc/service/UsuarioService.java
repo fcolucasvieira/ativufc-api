@@ -37,6 +37,7 @@ public class UsuarioService {
         return toResponse(usuario);
     }
 
+
     public UsuarioResponse buscarPorId(Long id) {
         return repository.findById(id)
                 .map(this::toResponse)
@@ -47,6 +48,23 @@ public class UsuarioService {
         return repository.findAll().stream()
                 .map(this::toResponse)
                 .toList();
+    }
+
+    public UsuarioResponse atualizarAtivo(Long id, boolean ativo) {
+        Usuario usuario = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        usuario.setAtivo(ativo);
+        repository.save(usuario);
+
+        return toResponse(usuario);
+    }
+
+    public void remover(Long id) {
+        Usuario usuario = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        repository.delete(usuario);
     }
 
     public UsuarioResponse toResponse(Usuario usuario) {
