@@ -6,7 +6,7 @@ import lombok.*;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "/solicitacoes_creditacao")
+@Table(name = "solicitacoes_creditacao")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -27,8 +27,15 @@ public class Solicitacao {
     @ManyToOne(optional = false)
     private Instituicao instituicao;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private TipoParticipacao tipoParticipacao;
+
     @Column(nullable = false)
     private Integer cargaHorariaTotal;
+
+    @Column(nullable = false)
+    private Integer horasAproveitadas;
 
     @Column(nullable = false)
     private LocalDate dataInicio;
@@ -48,4 +55,7 @@ public class Solicitacao {
 
     @Column(length = 350)
     private String observacaoResponsavel;
+
+    @Column(nullable = false)
+    private String comprovantePath;
 }

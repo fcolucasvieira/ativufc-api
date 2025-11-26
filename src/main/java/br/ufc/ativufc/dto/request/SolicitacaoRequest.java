@@ -1,5 +1,6 @@
 package br.ufc.ativufc.dto.request;
 
+import br.ufc.ativufc.model.TipoParticipacao;
 import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
@@ -15,17 +16,29 @@ public record SolicitacaoRequest(
         Long idInstituicao,
 
         @NotNull
+        TipoParticipacao tipoParticipacao,
+
+        @NotNull
         @Min(1)
         Integer cargaHorariaTotal,
 
         @NotNull
-        @FutureOrPresent
+        @Min(1)
+        Integer horasAproveitadas,
+
+        @NotNull
+        @PastOrPresent
         LocalDate dataInicio,
 
         @NotNull
-        @Future
+        @PastOrPresent
         LocalDate dataFim,
 
         @NotBlank
-        String observacao
+        @Size(max = 350)
+        String observacao,
+
+        @NotBlank
+        String comprovantePath
+
 ) {}

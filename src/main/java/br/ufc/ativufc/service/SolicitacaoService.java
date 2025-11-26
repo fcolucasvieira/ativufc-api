@@ -40,13 +40,16 @@ public class SolicitacaoService {
                 discente,
                 subtipo,
                 instituicao,
+                request.tipoParticipacao(),
                 request.cargaHorariaTotal(),
+                request.horasAproveitadas(),
                 request.dataInicio(),
                 request.dataFim(),
                 java.time.LocalDate.now(),
                 Status.PENDENTE,
                 request.observacao(),
-                null
+                null,
+                request.comprovantePath()
         );
 
         solicitacaoRepository.save(solicitacao);
@@ -123,10 +126,13 @@ public class SolicitacaoService {
                 solicitacao.getDiscente().getNome(),
                 solicitacao.getInstituicao().getNome(),
                 solicitacao.getSubTipoAtividade().getDescricaoSubTipoAtividade(),
+                solicitacao.getTipoParticipacao(),
                 solicitacao.getCargaHorariaTotal(),
-                solicitacao.getStatus(),
+                solicitacao.getHorasAproveitadas(),
                 solicitacao.getDataSolicitacao(),
-                solicitacao.getObservacaoResponsavel()
+                solicitacao.getStatus(),
+                solicitacao.getObservacaoResponsavel(),
+                solicitacao.getComprovantePath()
         );
     }
 }
