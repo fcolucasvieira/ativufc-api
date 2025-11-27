@@ -60,7 +60,7 @@ public class SolicitacaoController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/{id}/status")
+    @PatchMapping("/{id}/status")
     public ResponseEntity<SolicitacaoResponse> atualizarStatus(@PathVariable Long id, @Valid @RequestBody StatusRequest request) {
         SolicitacaoResponse response = service.atualizarStatus(id, request);
         return ResponseEntity.ok(response);

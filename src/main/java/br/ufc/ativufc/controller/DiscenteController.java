@@ -41,4 +41,10 @@ public class DiscenteController {
         DiscenteResponse response = service.atualizar(matricula, request);
         return ResponseEntity.ok(response);
     }
+
+    @DeleteMapping("/{matricula}")
+    public ResponseEntity<Void> deletar(@PathVariable String matricula){
+        service.deletar(matricula);
+        return ResponseEntity.noContent().build();
+    }
 }
