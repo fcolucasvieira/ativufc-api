@@ -2,8 +2,8 @@ package br.ufc.ativufc.service;
 
 import br.ufc.ativufc.dto.request.DiscenteRequest;
 import br.ufc.ativufc.dto.response.DiscenteResponse;
-import br.ufc.ativufc.exception.DiscenteAlreadyExistsException;
-import br.ufc.ativufc.exception.DiscenteNotFoundException;
+import br.ufc.ativufc.exception.AlreadyExistsException;
+import br.ufc.ativufc.exception.NotFoundException;
 import br.ufc.ativufc.model.Discente;
 import br.ufc.ativufc.model.Perfil;
 import br.ufc.ativufc.model.Usuario;
@@ -30,7 +30,7 @@ public class DiscenteService {
     // Cadastrar discente + usuário com validação
     public DiscenteResponse cadastrar(DiscenteRequest request) {
         if (discenteRepository.existsByMatricula(request.matricula()))
-            throw new DiscenteAlreadyExistsException();
+            throw new AlreadyExistsException("Discente com esta matrícula já cadastrado");
 
         Usuario usuario = new Usuario(
                 null,
@@ -58,7 +58,7 @@ public class DiscenteService {
 
     public DiscenteResponse buscarPorMatricula(String matricula) {
         Discente discente = discenteRepository.findByMatricula(matricula)
-                .orElseThrow(() -> new DiscenteNotFoundException("Discente não encontrado"));
+                .orElseThrow(() -> new NotFoundException("Discente não encontrado"));
         return toResponse(discente);
     }
 
@@ -66,14 +66,14 @@ public class DiscenteService {
         List<Discente> lista = discenteRepository.findAll();
 
         if(lista.isEmpty())
-            throw new DiscenteNotFoundException("Nenhum discente cadastrado");
+            throw new NotFoundException("Nenhum discente cadastrado");
 
         return lista.stream().map(this::toResponse).toList();
     }
 
     public DiscenteResponse atualizar(String matricula, DiscenteRequest request) {
         Discente discente = discenteRepository.findByMatricula(matricula)
-                .orElseThrow(() -> new DiscenteNotFoundException("Discente não encontrado"));
+                .orElseThrow(() -> new NotFoundException("Discente não encontrado"));
 
         if(!discente.getMatricula().equals(request.matricula()))
             throw new RuntimeException("Não é permitido alterar a matrícula do discente");
@@ -89,7 +89,7 @@ public class DiscenteService {
 
     public void deletar(String matricula){
         Discente discente = discenteRepository.findByMatricula(matricula)
-                .orElseThrow(() -> new DiscenteNotFoundException("Discente não encontrado"));
+                .orElseThrow(() -> new NotFoundException("Discente não encontrado"));
 
         discenteRepository.delete(discente);
     }

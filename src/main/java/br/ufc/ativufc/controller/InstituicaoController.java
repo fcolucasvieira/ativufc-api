@@ -27,17 +27,12 @@ public class InstituicaoController {
     @GetMapping("/{id}")
     public ResponseEntity<InstituicaoResponse> buscarPorId(@PathVariable Long id) {
         InstituicaoResponse response = service.buscarPorId(id);
-
-        if (response == null)
-            return ResponseEntity.notFound().build();
-
         return ResponseEntity.ok(response);
     }
 
     @GetMapping
-    public ResponseEntity<List<InstituicaoResponse>> listarTodos(){
-        List<InstituicaoResponse> lista = service.listarTodos();
-
+    public ResponseEntity<List<InstituicaoResponse>> listarTodas(){
+        List<InstituicaoResponse> lista = service.listarTodas();
         return ResponseEntity.ok(lista);
     }
 }

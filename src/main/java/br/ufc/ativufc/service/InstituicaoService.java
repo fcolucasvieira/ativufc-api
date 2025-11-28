@@ -2,6 +2,8 @@ package br.ufc.ativufc.service;
 
 import br.ufc.ativufc.dto.request.InstituicaoRequest;
 import br.ufc.ativufc.dto.response.InstituicaoResponse;
+import br.ufc.ativufc.exception.AlreadyExistsException;
+import br.ufc.ativufc.exception.NotFoundException;
 import br.ufc.ativufc.model.Instituicao;
 import br.ufc.ativufc.repository.InstituicaoRepository;
 import org.springframework.stereotype.Service;
@@ -17,37 +19,39 @@ public class InstituicaoService {
     }
 
     public InstituicaoResponse cadastrar(InstituicaoRequest request) {
-        Instituicao instituicao = new Instituicao(
-                null,
+        if (repository.existsByCnpj(request.cnpj()))
+            throw new AlreadyExistsException("Instituição com este CNPJ já cadastrada");
+
+        if(repository.existsByNome(request.nome()))
+            throw new AlreadyExistsException("Instituição com este nome já cadastrada");
+
+        Instituicao instituicao = new Instituicao(null,
                 request.nome(),
                 request.cnpj(),
-                request.endereco()
-        );
+                request.endereco());
 
         repository.save(instituicao);
 
         return toResponse(instituicao);
     }
 
-    public InstituicaoResponse buscarPorId(Long id){
-        return repository.findById(id)
-                .map(this::toResponse)
-                .orElse(null);
+    public InstituicaoResponse buscarPorId(Long id) {
+        Instituicao instituicao = repository.findById(id).orElseThrow(() -> new NotFoundException("Instituição não encontrada"));
+        return toResponse(instituicao);
     }
 
-    public List<InstituicaoResponse> listarTodos(){
-        return repository.findAll().stream()
-                .map(this::toResponse)
-                .toList();
+    public List<InstituicaoResponse> listarTodas() {
+        List<Instituicao> lista = repository.findAll();
+        if (lista.isEmpty()) throw new NotFoundException("Nenhuma instituição cadastrada");
+
+        return lista.stream().map(this::toResponse).toList();
     }
 
     public InstituicaoResponse toResponse(Instituicao instituicao) {
-        return new InstituicaoResponse(
-                instituicao.getId(),
+        return new InstituicaoResponse(instituicao.getId(),
                 instituicao.getNome(),
                 instituicao.getCnpj(),
-                instituicao.getEndereco()
-        );
+                instituicao.getEndereco());
     }
 
 }
