@@ -4,9 +4,12 @@ import br.ufc.ativufc.dto.request.DiscenteRequest;
 import br.ufc.ativufc.dto.response.DiscenteResponse;
 import br.ufc.ativufc.exception.AlreadyExistsException;
 import br.ufc.ativufc.exception.NotFoundException;
+import br.ufc.ativufc.exception.OperationNotAllowedException;
+import br.ufc.ativufc.model.Curso;
 import br.ufc.ativufc.model.Discente;
 import br.ufc.ativufc.model.Perfil;
 import br.ufc.ativufc.model.Usuario;
+import br.ufc.ativufc.repository.CursoRepository;
 import br.ufc.ativufc.repository.DiscenteRepository;
 import br.ufc.ativufc.repository.UsuarioRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,18 +22,26 @@ public class DiscenteService {
 
     private final DiscenteRepository discenteRepository;
     private final UsuarioRepository usuarioRepository;
+    private final CursoRepository cursoRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public DiscenteService(DiscenteRepository discenteRepository, UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
+    public DiscenteService(DiscenteRepository discenteRepository, UsuarioRepository usuarioRepository, CursoRepository cursoRepository, PasswordEncoder passwordEncoder) {
         this.discenteRepository = discenteRepository;
         this.usuarioRepository = usuarioRepository;
+        this.cursoRepository = cursoRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
     // Cadastrar discente + usuário com validação
     public DiscenteResponse cadastrar(DiscenteRequest request) {
         if (discenteRepository.existsByMatricula(request.matricula()))
-            throw new AlreadyExistsException("Discente com esta matrícula já cadastrado");
+            throw new AlreadyExistsException("Discente já cadastrado com esta matrícula");
+
+        Curso curso = cursoRepository.findById(request.idCurso())
+                .orElseThrow(() -> new NotFoundException("Curso não encontrado"));
+
+        if(request.horasCumpridas() != null && request.horasCumpridas() > curso.getTotalHorasComplementares())
+            throw new OperationNotAllowedException("Horas cumpridas iniciais não podem exceder o total de horas complementares do curso");
 
         Usuario usuario = new Usuario(
                 null,
@@ -47,7 +58,8 @@ public class DiscenteService {
                 request.matricula(),
                 request.nome(),
                 request.ingressao(),
-                request.totalHorasComplementares(),
+                curso,
+                request.horasCumpridas(),
                 usuario
         );
 
@@ -76,18 +88,23 @@ public class DiscenteService {
                 .orElseThrow(() -> new NotFoundException("Discente não encontrado"));
 
         if(!discente.getMatricula().equals(request.matricula()))
-            throw new RuntimeException("Não é permitido alterar a matrícula do discente");
+            throw new OperationNotAllowedException("Não é permitido alterar a matrícula do discente");
+
+        if(!discente.getHorasCumpridas().equals(request.horasCumpridas()))
+            throw new OperationNotAllowedException("Não é permitido alterar a quantidade de horas cumpridas uma vez cadastrado");
+
+        Curso curso = cursoRepository.findById(request.idCurso())
+                        .orElseThrow(() -> new NotFoundException("Curso não encontrado"));
 
         discente.setNome(request.nome());
         discente.setIngressao(request.ingressao());
-        discente.setTotalHorasComplementares(request.totalHorasComplementares());
-
+        discente.setCurso(curso);
 
         discenteRepository.save(discente);
         return toResponse(discente);
     }
 
-    public void deletar(String matricula){
+    public void remover(String matricula){
         Discente discente = discenteRepository.findByMatricula(matricula)
                 .orElseThrow(() -> new NotFoundException("Discente não encontrado"));
 
@@ -100,7 +117,10 @@ public class DiscenteService {
                 discente.getNome(),
                 discente.getUsuario().getEmail(),
                 discente.getIngressao(),
-                discente.getTotalHorasComplementares()
+                discente.getCurso().getNome(),
+                discente.getCurso().getTotalHorasComplementares(),
+                discente.getHorasCumpridas(),
+                discente.getHorasRestantes()
         );
     }
 }

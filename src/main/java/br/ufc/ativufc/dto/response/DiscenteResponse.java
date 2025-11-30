@@ -7,5 +7,8 @@ public record DiscenteResponse(
         String nome,
         String email,
         LocalDate ingressao,
-        Integer totalHorasComplementares
+        String cursoNome,
+        Integer totalHorasComplementares,
+        Integer horasCumpridas,
+        Integer horasRestantes
 ) {}

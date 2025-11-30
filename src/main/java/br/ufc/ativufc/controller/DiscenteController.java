@@ -43,8 +43,8 @@ public class DiscenteController {
     }
 
     @DeleteMapping("/{matricula}")
-    public ResponseEntity<Void> deletar(@PathVariable String matricula){
-        service.deletar(matricula);
+    public ResponseEntity<Void> remover(@PathVariable String matricula){
+        service.remover(matricula);
         return ResponseEntity.noContent().build();
     }
 }

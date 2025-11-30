@@ -24,10 +24,18 @@ public class Discente {
     @Column(nullable = false)
     private LocalDate ingressao;
 
+    @ManyToOne(optional = false)
+    private Curso curso;
+
     @Column(nullable = false)
-    private Integer totalHorasComplementares;
+    private Integer horasCumpridas;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
+
+    public int getHorasRestantes(){
+        int restantes = curso.getTotalHorasComplementares() - horasCumpridas;
+        return Math.max(restantes, 0);
+    }
 }

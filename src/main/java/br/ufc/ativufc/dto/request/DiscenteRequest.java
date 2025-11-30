@@ -1,9 +1,6 @@
 package br.ufc.ativufc.dto.request;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
 
@@ -18,7 +15,11 @@ public record DiscenteRequest(
         LocalDate ingressao,
 
         @NotNull
-        Integer totalHorasComplementares,
+        Long idCurso,
+
+        @NotNull
+        @Min(0)
+        Integer horasCumpridas,
 
         @NotBlank
         @Email
