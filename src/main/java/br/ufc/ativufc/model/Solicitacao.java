@@ -34,7 +34,7 @@ public class Solicitacao {
     @Column(nullable = false)
     private Integer cargaHorariaTotal;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Integer horasAproveitadas;
 
     @Column(nullable = false)

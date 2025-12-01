@@ -6,6 +6,7 @@ import br.ufc.ativufc.exception.AlreadyExistsException;
 import br.ufc.ativufc.exception.NotFoundException;
 import br.ufc.ativufc.model.Instituicao;
 import br.ufc.ativufc.repository.InstituicaoRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,6 +19,7 @@ public class InstituicaoService {
         this.repository = repository;
     }
 
+    @Transactional
     public InstituicaoResponse cadastrar(InstituicaoRequest request) {
         if (repository.existsByCnpj(request.cnpj()))
             throw new AlreadyExistsException("Instituição com este CNPJ já cadastrada");
@@ -41,10 +43,10 @@ public class InstituicaoService {
     }
 
     public List<InstituicaoResponse> listarTodas() {
-        List<Instituicao> lista = repository.findAll();
-        if (lista.isEmpty()) throw new NotFoundException("Nenhuma instituição cadastrada");
+        return repository.findAll().stream()
+                .map(this::toResponse)
+                .toList();
 
-        return lista.stream().map(this::toResponse).toList();
     }
 
     public InstituicaoResponse toResponse(Instituicao instituicao) {

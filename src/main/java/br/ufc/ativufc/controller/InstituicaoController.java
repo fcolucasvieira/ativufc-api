@@ -3,6 +3,7 @@ package br.ufc.ativufc.controller;
 import br.ufc.ativufc.dto.request.InstituicaoRequest;
 import br.ufc.ativufc.dto.response.InstituicaoResponse;
 import br.ufc.ativufc.service.InstituicaoService;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

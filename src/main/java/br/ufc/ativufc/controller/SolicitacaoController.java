@@ -6,6 +6,7 @@ import br.ufc.ativufc.dto.response.SolicitacaoResponse;
 import br.ufc.ativufc.dto.request.StatusRequest;
 import br.ufc.ativufc.model.Status;
 import br.ufc.ativufc.service.SolicitacaoService;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,10 +30,6 @@ public class SolicitacaoController {
     @GetMapping("/{id}")
     public ResponseEntity<SolicitacaoResponse> buscarPorId(@PathVariable Long id) {
         SolicitacaoResponse response = service.buscarPorId(id);
-
-        if (response == null)
-            return ResponseEntity.notFound().build();
-
         return ResponseEntity.ok(response);
     }
 
@@ -55,7 +52,7 @@ public class SolicitacaoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<SolicitacaoResponse> atualizar(@PathVariable Long id, @RequestBody AtualizarSolicitacaoRequest request) {
+    public ResponseEntity<SolicitacaoResponse> atualizar(@PathVariable Long id, @Valid @RequestBody AtualizarSolicitacaoRequest request) {
         SolicitacaoResponse response = service.atualizar(id, request);
         return ResponseEntity.ok(response);
     }

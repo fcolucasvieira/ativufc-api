@@ -1,5 +1,6 @@
 package br.ufc.ativufc.service;
 
+import br.ufc.ativufc.dto.request.AtualizarDiscenteRequest;
 import br.ufc.ativufc.dto.request.DiscenteRequest;
 import br.ufc.ativufc.dto.response.DiscenteResponse;
 import br.ufc.ativufc.exception.AlreadyExistsException;
@@ -12,6 +13,7 @@ import br.ufc.ativufc.model.Usuario;
 import br.ufc.ativufc.repository.CursoRepository;
 import br.ufc.ativufc.repository.DiscenteRepository;
 import br.ufc.ativufc.repository.UsuarioRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +34,8 @@ public class DiscenteService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    // Cadastrar discente + usuário com validação
+    // Cadastrar discente + usuário
+    @Transactional
     public DiscenteResponse cadastrar(DiscenteRequest request) {
         if (discenteRepository.existsByMatricula(request.matricula()))
             throw new AlreadyExistsException("Discente já cadastrado com esta matrícula");
@@ -75,35 +78,36 @@ public class DiscenteService {
     }
 
     public List<DiscenteResponse> listarTodos() {
-        List<Discente> lista = discenteRepository.findAll();
-
-        if(lista.isEmpty())
-            throw new NotFoundException("Nenhum discente cadastrado");
-
-        return lista.stream().map(this::toResponse).toList();
+        return discenteRepository.findAll().stream()
+                .map(this::toResponse)
+                .toList();
     }
 
-    public DiscenteResponse atualizar(String matricula, DiscenteRequest request) {
+    @Transactional
+    public DiscenteResponse atualizar(String matricula, AtualizarDiscenteRequest request) {
         Discente discente = discenteRepository.findByMatricula(matricula)
                 .orElseThrow(() -> new NotFoundException("Discente não encontrado"));
 
-        if(!discente.getMatricula().equals(request.matricula()))
-            throw new OperationNotAllowedException("Não é permitido alterar a matrícula do discente");
+        if (request.nome() != null) {
+            discente.setNome(request.nome());
+        }
 
-        if(!discente.getHorasCumpridas().equals(request.horasCumpridas()))
-            throw new OperationNotAllowedException("Não é permitido alterar a quantidade de horas cumpridas uma vez cadastrado");
+        if (request.ingressao() != null) {
+            discente.setIngressao(request.ingressao());
+        }
 
-        Curso curso = cursoRepository.findById(request.idCurso())
-                        .orElseThrow(() -> new NotFoundException("Curso não encontrado"));
-
-        discente.setNome(request.nome());
-        discente.setIngressao(request.ingressao());
-        discente.setCurso(curso);
+        if (request.idCurso() != null) {
+            Curso curso = cursoRepository.findById(request.idCurso())
+                    .orElseThrow(() -> new NotFoundException("Curso não encontrado"));
+            discente.setCurso(curso);
+        }
 
         discenteRepository.save(discente);
         return toResponse(discente);
     }
 
+
+    @Transactional
     public void remover(String matricula){
         Discente discente = discenteRepository.findByMatricula(matricula)
                 .orElseThrow(() -> new NotFoundException("Discente não encontrado"));

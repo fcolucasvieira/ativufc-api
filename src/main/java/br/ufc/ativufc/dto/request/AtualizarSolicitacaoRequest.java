@@ -1,29 +1,28 @@
 package br.ufc.ativufc.dto.request;
 
+import br.ufc.ativufc.model.TipoParticipacao;
 import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
 
 public record AtualizarSolicitacaoRequest(
-        @NotNull
         Long idSubtipoAtividade,
-
-        @NotNull
         Long idInstituicao,
 
-        @NotNull
         @Min(1)
         Integer cargaHorariaTotal,
 
-        @NotNull
-        @FutureOrPresent
+        @PastOrPresent
         LocalDate dataInicio,
 
-        @NotNull
-        @Future
+        @PastOrPresent
         LocalDate dataFim,
 
-        @NotBlank
-        String observacao
+        TipoParticipacao tipoParticipacao,
+
+        @Size(max = 350)
+        String observacao,
+
+        String comprovantePath
 ) {
 }

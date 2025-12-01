@@ -23,10 +23,6 @@ public record SolicitacaoRequest(
         Integer cargaHorariaTotal,
 
         @NotNull
-        @Min(1)
-        Integer horasAproveitadas,
-
-        @NotNull
         @PastOrPresent
         LocalDate dataInicio,
 

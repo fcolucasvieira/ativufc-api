@@ -4,10 +4,14 @@ import br.ufc.ativufc.dto.request.AtualizarSolicitacaoRequest;
 import br.ufc.ativufc.dto.request.SolicitacaoRequest;
 import br.ufc.ativufc.dto.request.StatusRequest;
 import br.ufc.ativufc.dto.response.SolicitacaoResponse;
+import br.ufc.ativufc.exception.NotFoundException;
+import br.ufc.ativufc.exception.OperationNotAllowedException;
 import br.ufc.ativufc.model.*;
 import br.ufc.ativufc.repository.*;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -30,10 +34,23 @@ public class SolicitacaoService {
         this.instituicaoRepository = instituicaoRepository;
     }
 
+    @Transactional
     public SolicitacaoResponse cadastrar(SolicitacaoRequest request) {
-        Discente discente = discenteRepository.findByMatricula(request.matriculaDiscente()).get();
-        SubtipoAtividade subtipo = subtipoRepository.findById(request.idSubtipoAtividade()).get();
-        Instituicao instituicao = instituicaoRepository.findById(request.idInstituicao()).get();
+        Discente discente = discenteRepository.findByMatricula(request.matriculaDiscente())
+                .orElseThrow(() -> new NotFoundException("Discente não encontrado"));
+
+        SubtipoAtividade subtipo = subtipoRepository.findById(request.idSubtipoAtividade())
+                .orElseThrow(() -> new NotFoundException("Subtipo de atividade não encontrado"));
+
+        Instituicao instituicao = instituicaoRepository.findById(request.idInstituicao())
+                .orElseThrow(() -> new NotFoundException("Instituição não encontrada"));
+
+        // Validações de negócio
+        if(request.dataFim().isBefore(request.dataInicio()))
+            throw new OperationNotAllowedException("Data fim não pode ser anterior à data início");
+
+        if(request.cargaHorariaTotal() > subtipo.getCargaHorariaMaxima())
+            throw new OperationNotAllowedException("Carga horária total não pode exceder o limite permitido");
 
         Solicitacao solicitacao = new Solicitacao(
                 null,
@@ -42,7 +59,7 @@ public class SolicitacaoService {
                 instituicao,
                 request.tipoParticipacao(),
                 request.cargaHorariaTotal(),
-                request.horasAproveitadas(),
+                null,
                 request.dataInicio(),
                 request.dataFim(),
                 java.time.LocalDate.now(),
@@ -53,14 +70,14 @@ public class SolicitacaoService {
         );
 
         solicitacaoRepository.save(solicitacao);
-
         return toResponse(solicitacao);
     }
 
     public SolicitacaoResponse buscarPorId(Long id){
-    Solicitacao solicitacao = solicitacaoRepository.findById(id).get();
+        Solicitacao solicitacao = solicitacaoRepository.findById(id)
+            .orElseThrow(() -> new NotFoundException("Solicitação não encontrada"));
 
-    return toResponse(solicitacao);
+        return toResponse(solicitacao);
     }
 
     public List<SolicitacaoResponse> listarTodos() {
@@ -70,7 +87,8 @@ public class SolicitacaoService {
     }
 
     public List<SolicitacaoResponse> listarPorMatricula(String matricula) {
-        Discente discente = discenteRepository.findByMatricula(matricula).get();
+        Discente discente = discenteRepository.findByMatricula(matricula)
+                .orElseThrow(() -> new NotFoundException("Discente não encontrado"));
 
         return solicitacaoRepository.findByDiscente(discente).stream()
                 .map(this::toResponse)
@@ -78,59 +96,120 @@ public class SolicitacaoService {
     }
 
     public List<SolicitacaoResponse> listarPorStatus(Status status){
-        List<Solicitacao> solicitacoes = solicitacaoRepository.findByStatus(status);
-
         return solicitacaoRepository.findByStatus(status).stream()
                 .map(this::toResponse)
                 .toList();
     }
 
-    // Simplificar metodo (Atualizações futuras)
-    public SolicitacaoResponse atualizar(Long id, AtualizarSolicitacaoRequest request){
+    @Transactional
+    public SolicitacaoResponse atualizar(Long id, AtualizarSolicitacaoRequest request) {
         Solicitacao solicitacao = solicitacaoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Solicitação não encontrada"));
+                .orElseThrow(() -> new NotFoundException("Solicitação não encontrada"));
 
-        if(solicitacao.getStatus() != Status.PENDENTE)
-            throw new IllegalStateException("Solicitação só pode ser editada enquanto status PENDENTE");
+        if (solicitacao.getStatus() != Status.PENDENTE) {
+            throw new OperationNotAllowedException("Solicitação só pode ser editada enquanto status estiver PENDENTE");
+        }
 
-        solicitacao.setCargaHorariaTotal(request.cargaHorariaTotal());
-        solicitacao.setDataInicio(request.dataInicio());
-        solicitacao.setDataFim(request.dataFim());
-        solicitacao.setObservacao(request.observacao());
+        if (request.cargaHorariaTotal() != null) {
+            if (solicitacao.getHorasAproveitadas() != null &&
+                    solicitacao.getHorasAproveitadas() > request.cargaHorariaTotal()) {
+                throw new OperationNotAllowedException("Horas aproveitadas atuais excedem a nova carga horária total");
+            }
 
-        Instituicao instituicao = instituicaoRepository.findById(request.idInstituicao())
-                .orElseThrow(() -> new RuntimeException("Instituição não encontrada"));
-        solicitacao.setInstituicao(instituicao);
+            if (request.cargaHorariaTotal() > solicitacao.getSubTipoAtividade().getCargaHorariaMaxima()) {
+                throw new OperationNotAllowedException("Carga horária total não pode exceder o limite permitido");
+            }
 
-        SubtipoAtividade subtipo = subtipoRepository.findById(request.idSubtipoAtividade())
-                .orElseThrow(() -> new RuntimeException("Subtipo de atividade não encontrado"));
-        solicitacao.setSubTipoAtividade(subtipo);
+            solicitacao.setCargaHorariaTotal(request.cargaHorariaTotal());
+        }
+
+        LocalDate novaDataInicio = request.dataInicio() != null ? request.dataInicio() : solicitacao.getDataInicio();
+        LocalDate novaDataFim = request.dataFim() != null ? request.dataFim() : solicitacao.getDataFim();
+
+        if (request.dataInicio() != null) {
+            solicitacao.setDataInicio(request.dataInicio());
+        }
+        if (request.dataFim() != null) {
+            solicitacao.setDataFim(request.dataFim());
+        }
+
+        if (novaDataInicio != null && novaDataFim != null && novaDataFim.isBefore(novaDataInicio)) {
+            throw new OperationNotAllowedException("Data fim não pode ser anterior à data início");
+        }
+
+        if (request.tipoParticipacao() != null) {
+            solicitacao.setTipoParticipacao(request.tipoParticipacao());
+        }
+
+        if (request.observacao() != null) {
+            solicitacao.setObservacao(request.observacao());
+        }
+
+        if (request.comprovantePath() != null) {
+            solicitacao.setComprovantePath(request.comprovantePath());
+        }
+
+        if (request.idInstituicao() != null) {
+            Instituicao instituicao = instituicaoRepository.findById(request.idInstituicao())
+                    .orElseThrow(() -> new NotFoundException("Instituição não encontrada"));
+            solicitacao.setInstituicao(instituicao);
+        }
+
+        if (request.idSubtipoAtividade() != null) {
+            SubtipoAtividade subtipo = subtipoRepository.findById(request.idSubtipoAtividade())
+                    .orElseThrow(() -> new NotFoundException("Subtipo de atividade não encontrado"));
+            solicitacao.setSubTipoAtividade(subtipo);
+        }
 
         solicitacaoRepository.save(solicitacao);
         return toResponse(solicitacao);
     }
 
+
+    @Transactional
     public SolicitacaoResponse atualizarStatus(Long id, StatusRequest request){
-        Solicitacao solicitacao = solicitacaoRepository.findById(id).get();
+        Solicitacao solicitacao = solicitacaoRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Solicitação não encontrada"));
+
 
         solicitacao.setStatus(request.status());
         solicitacao.setObservacaoResponsavel(request.observacaoResponsavel());
-        solicitacaoRepository.save(solicitacao);
 
+        if(request.status() == Status.DEFERIDA){
+            if (request.horasAproveitadas() == null) {
+                throw new OperationNotAllowedException("Horas aproveitadas devem ser informadas ao deferir a solicitação");
+            }
+            if (request.horasAproveitadas() > solicitacao.getCargaHorariaTotal()) {
+                throw new OperationNotAllowedException("Horas aproveitadas não podem exceder a carga horária total");
+            }
+            solicitacao.setHorasAproveitadas(request.horasAproveitadas());
+
+            Discente discente = solicitacao.getDiscente();
+            discente.setHorasCumpridas(discente.getHorasCumpridas() + solicitacao.getHorasAproveitadas());
+            discenteRepository.save(discente);
+        } else if(request.status() == Status.INDEFERIDA){
+            solicitacao.setHorasAproveitadas(0);
+        }
+
+        solicitacaoRepository.save(solicitacao);
         return toResponse(solicitacao);
     }
 
     public SolicitacaoResponse toResponse(Solicitacao solicitacao) {
         return new SolicitacaoResponse(
                 solicitacao.getId(),
+                solicitacao.getDiscente().getMatricula(),
                 solicitacao.getDiscente().getNome(),
                 solicitacao.getInstituicao().getNome(),
                 solicitacao.getSubTipoAtividade().getDescricaoSubTipoAtividade(),
                 solicitacao.getTipoParticipacao(),
                 solicitacao.getCargaHorariaTotal(),
                 solicitacao.getHorasAproveitadas(),
+                solicitacao.getDataInicio(),
+                solicitacao.getDataFim(),
                 solicitacao.getDataSolicitacao(),
                 solicitacao.getStatus(),
+                solicitacao.getObservacao(),
                 solicitacao.getObservacaoResponsavel(),
                 solicitacao.getComprovantePath()
         );
