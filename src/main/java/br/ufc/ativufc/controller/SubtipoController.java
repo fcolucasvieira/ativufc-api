@@ -27,10 +27,6 @@ public class SubtipoController {
     @GetMapping("/{id}")
     public ResponseEntity<SubtipoResponse> buscarPorId(@PathVariable Long id){
         SubtipoResponse response = service.buscarPorId(id);
-
-        if(response == null)
-            return ResponseEntity.notFound().build();
-
         return ResponseEntity.ok(response);
     }
 
@@ -38,6 +34,18 @@ public class SubtipoController {
     public ResponseEntity<List<SubtipoResponse>> listarTodos() {
         List<SubtipoResponse> lista = service.listarTodos();
         return ResponseEntity.ok(lista);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<SubtipoResponse> atualizar(@PathVariable Long id, @Valid @RequestBody SubtipoRequest request){
+        SubtipoResponse response = service.atualizar(id, request);
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> remover(@PathVariable Long id){
+        service.remover(id);
+        return ResponseEntity.noContent().build();
     }
 
 

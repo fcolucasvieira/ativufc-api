@@ -6,7 +6,6 @@ import br.ufc.ativufc.dto.response.SolicitacaoResponse;
 import br.ufc.ativufc.dto.request.StatusRequest;
 import br.ufc.ativufc.model.Status;
 import br.ufc.ativufc.service.SolicitacaoService;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -61,5 +60,11 @@ public class SolicitacaoController {
     public ResponseEntity<SolicitacaoResponse> atualizarStatus(@PathVariable Long id, @Valid @RequestBody StatusRequest request) {
         SolicitacaoResponse response = service.atualizarStatus(id, request);
         return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> remover(@PathVariable Long id){
+        service.remover(id);
+        return ResponseEntity.noContent().build();
     }
 }

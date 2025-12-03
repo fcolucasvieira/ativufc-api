@@ -110,21 +110,21 @@ public class SolicitacaoService {
             throw new OperationNotAllowedException("Solicitação só pode ser editada enquanto status estiver PENDENTE");
         }
 
+        // Validação e atualização da carga horária total
         if (request.cargaHorariaTotal() != null) {
-            if (solicitacao.getHorasAproveitadas() != null &&
-                    solicitacao.getHorasAproveitadas() > request.cargaHorariaTotal()) {
-                throw new OperationNotAllowedException("Horas aproveitadas atuais excedem a nova carga horária total");
-            }
-
             if (request.cargaHorariaTotal() > solicitacao.getSubTipoAtividade().getCargaHorariaMaxima()) {
                 throw new OperationNotAllowedException("Carga horária total não pode exceder o limite permitido");
             }
-
             solicitacao.setCargaHorariaTotal(request.cargaHorariaTotal());
         }
 
+        // Validação de datas
         LocalDate novaDataInicio = request.dataInicio() != null ? request.dataInicio() : solicitacao.getDataInicio();
         LocalDate novaDataFim = request.dataFim() != null ? request.dataFim() : solicitacao.getDataFim();
+
+        if (novaDataInicio != null && novaDataFim != null && novaDataFim.isBefore(novaDataInicio)) {
+            throw new OperationNotAllowedException("Data fim não pode ser anterior à data início");
+        }
 
         if (request.dataInicio() != null) {
             solicitacao.setDataInicio(request.dataInicio());
@@ -133,37 +133,41 @@ public class SolicitacaoService {
             solicitacao.setDataFim(request.dataFim());
         }
 
-        if (novaDataInicio != null && novaDataFim != null && novaDataFim.isBefore(novaDataInicio)) {
-            throw new OperationNotAllowedException("Data fim não pode ser anterior à data início");
-        }
-
+        // Atualização de campos opcionais
         if (request.tipoParticipacao() != null) {
             solicitacao.setTipoParticipacao(request.tipoParticipacao());
         }
-
         if (request.observacao() != null) {
             solicitacao.setObservacao(request.observacao());
         }
-
         if (request.comprovantePath() != null) {
             solicitacao.setComprovantePath(request.comprovantePath());
         }
 
+        // Atualização de instituição
         if (request.idInstituicao() != null) {
             Instituicao instituicao = instituicaoRepository.findById(request.idInstituicao())
                     .orElseThrow(() -> new NotFoundException("Instituição não encontrada"));
             solicitacao.setInstituicao(instituicao);
         }
 
+        // Atualização de subtipo com validação
         if (request.idSubtipoAtividade() != null) {
             SubtipoAtividade subtipo = subtipoRepository.findById(request.idSubtipoAtividade())
                     .orElseThrow(() -> new NotFoundException("Subtipo de atividade não encontrado"));
+
+            if (solicitacao.getCargaHorariaTotal() != null &&
+                    solicitacao.getCargaHorariaTotal() > subtipo.getCargaHorariaMaxima()) {
+                throw new OperationNotAllowedException("Carga horária total excede o limite do novo subtipo");
+            }
+
             solicitacao.setSubTipoAtividade(subtipo);
         }
 
         solicitacaoRepository.save(solicitacao);
         return toResponse(solicitacao);
     }
+
 
 
     @Transactional
@@ -194,6 +198,19 @@ public class SolicitacaoService {
         solicitacaoRepository.save(solicitacao);
         return toResponse(solicitacao);
     }
+
+    @Transactional
+    public void remover(Long id) {
+        Solicitacao solicitacao = solicitacaoRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Solicitação não encontrada"));
+
+        if (solicitacao.getStatus() != Status.PENDENTE) {
+            throw new OperationNotAllowedException("Só é possível remover solicitações com status PENDENTE");
+        }
+
+        solicitacaoRepository.delete(solicitacao);
+    }
+
 
     public SolicitacaoResponse toResponse(Solicitacao solicitacao) {
         return new SolicitacaoResponse(

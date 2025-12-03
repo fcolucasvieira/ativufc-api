@@ -2,6 +2,8 @@ package br.ufc.ativufc.service;
 
 import br.ufc.ativufc.dto.request.SubtipoRequest;
 import br.ufc.ativufc.dto.response.SubtipoResponse;
+import br.ufc.ativufc.exception.AlreadyExistsException;
+import br.ufc.ativufc.exception.NotFoundException;
 import br.ufc.ativufc.model.SubtipoAtividade;
 import br.ufc.ativufc.repository.SubtipoRepository;
 import org.springframework.stereotype.Service;
@@ -17,27 +19,58 @@ public class SubtipoService {
     }
 
     public SubtipoResponse cadastrar(SubtipoRequest request) {
+        if (repository.existsByDescricao(request.descricaoSubTipoAtividade()))
+            throw new AlreadyExistsException("Subtipo já cadastrado com esta descrição");
+
         SubtipoAtividade subtipo = new SubtipoAtividade(
                 null,
                 request.descricaoSubTipoAtividade(),
                 request.cargaHorariaMaxima());
 
         repository.save(subtipo);
-
         return toResponse(subtipo);
     }
 
     public SubtipoResponse buscarPorId(Long id) {
-        return repository.findById(id)
-                .map(this::toResponse)
-                .orElse(null);
+        SubtipoAtividade subtipo = repository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Subtipo não encontrado"));
+        return toResponse(subtipo);
     }
-
 
     public List<SubtipoResponse> listarTodos() {
         return repository.findAll().stream()
                 .map(this::toResponse)
                 .toList();
+    }
+
+    public SubtipoResponse atualizar(Long id, SubtipoRequest request) {
+        SubtipoAtividade subtipo = repository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Subtipo não encontrado"));
+
+        if (request.descricaoSubTipoAtividade() != null &&
+                !subtipo.getDescricaoSubTipoAtividade().equals(request.descricaoSubTipoAtividade())) {
+
+            if (repository.existsByDescricao(request.descricaoSubTipoAtividade())) {
+                throw new AlreadyExistsException("Subtipo já cadastrado com esta descrição");
+            }
+
+            subtipo.setDescricaoSubTipoAtividade(request.descricaoSubTipoAtividade());
+        }
+
+        if (request.cargaHorariaMaxima() != null) {
+            subtipo.setCargaHorariaMaxima(request.cargaHorariaMaxima());
+        }
+
+        repository.save(subtipo);
+        return toResponse(subtipo);
+    }
+
+
+    public void remover(Long id) {
+        SubtipoAtividade subtipo = repository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Subtipo não encontrado"));
+
+        repository.delete(subtipo);
     }
 
     public SubtipoResponse toResponse(SubtipoAtividade subtipo) {
