@@ -24,9 +24,9 @@ public class ResponsavelController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{cpf}")
-    public ResponseEntity<ResponsavelResponse> buscarPorCpf(@PathVariable String cpf){
-        ResponsavelResponse response = service.buscarPorCpf(cpf);
+    @GetMapping("/{siape}")
+    public ResponseEntity<ResponsavelResponse> buscarPorSiape(@PathVariable String siape){
+        ResponsavelResponse response = service.buscarPorSiape(siape);
         return ResponseEntity.ok(response);
     }
 
@@ -36,9 +36,9 @@ public class ResponsavelController {
         return ResponseEntity.ok(lista);
     }
 
-    @PutMapping("/{cpf}")
-    public ResponseEntity<ResponsavelResponse> atualizar(@PathVariable String cpf, @Valid @RequestBody ResponsavelRequest request){
-        ResponsavelResponse response = service.atualizar(cpf, request);
+    @PutMapping("/{siape}")
+    public ResponseEntity<ResponsavelResponse> atualizar(@PathVariable String siape, @Valid @RequestBody ResponsavelRequest request){
+        ResponsavelResponse response = service.atualizar(siape, request);
         return ResponseEntity.ok(response);
     }
 }

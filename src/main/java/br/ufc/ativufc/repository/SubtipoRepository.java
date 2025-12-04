@@ -5,5 +5,5 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface SubtipoRepository extends JpaRepository<SubtipoAtividade, Long> {
-        boolean existsByDescricao(String descricaoSubTipoAtividade);
+        boolean existsByDescricaoSubTipoAtividade(String descricaoSubTipoAtividade);
 }

@@ -9,12 +9,12 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(of = "cpf")
+@EqualsAndHashCode(of = "siape")
 public class Responsavel {
 
     @Id
     @Column(nullable = false, unique = true)
-    private String cpf;
+    private String siape;
 
     @Column(nullable = false)
     private String nome;

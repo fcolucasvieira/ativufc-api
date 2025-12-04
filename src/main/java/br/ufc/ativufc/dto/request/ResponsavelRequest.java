@@ -5,9 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 import org.hibernate.validator.constraints.br.CPF;
 
 public record ResponsavelRequest(
-        @CPF
         @NotBlank
-        String cpf,
+        String siape,
 
         @NotBlank
         String nome,

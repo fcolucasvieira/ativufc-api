@@ -19,7 +19,7 @@ public class SubtipoService {
     }
 
     public SubtipoResponse cadastrar(SubtipoRequest request) {
-        if (repository.existsByDescricao(request.descricaoSubTipoAtividade()))
+        if (repository.existsByDescricaoSubTipoAtividade(request.descricaoSubTipoAtividade()))
             throw new AlreadyExistsException("Subtipo já cadastrado com esta descrição");
 
         SubtipoAtividade subtipo = new SubtipoAtividade(
@@ -50,7 +50,7 @@ public class SubtipoService {
         if (request.descricaoSubTipoAtividade() != null &&
                 !subtipo.getDescricaoSubTipoAtividade().equals(request.descricaoSubTipoAtividade())) {
 
-            if (repository.existsByDescricao(request.descricaoSubTipoAtividade())) {
+            if (repository.existsByDescricaoSubTipoAtividade(request.descricaoSubTipoAtividade())) {
                 throw new AlreadyExistsException("Subtipo já cadastrado com esta descrição");
             }
 

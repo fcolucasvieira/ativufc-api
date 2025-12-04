@@ -1,8 +1,7 @@
-package br.ufc.ativufc.controller;
+package br.ufc.ativufc.security;
 
 import br.ufc.ativufc.dto.request.LoginRequest;
 import br.ufc.ativufc.dto.response.TokenResponse;
-import br.ufc.ativufc.security.AuthenticationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
