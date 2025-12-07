@@ -1,6 +1,6 @@
 package br.ufc.ativufc.dto.request;
 
-import br.ufc.ativufc.model.TipoParticipacao;
+import br.ufc.ativufc.model.enums.TipoParticipacao;
 import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;

@@ -1,6 +1,6 @@
 package br.ufc.ativufc.service;
 
-import br.ufc.ativufc.dto.request.AtualizarDiscenteRequest;
+import br.ufc.ativufc.dto.request.update.UpdateDiscenteRequest;
 import br.ufc.ativufc.dto.request.DiscenteRequest;
 import br.ufc.ativufc.dto.response.DiscenteResponse;
 import br.ufc.ativufc.exception.AlreadyExistsException;
@@ -8,16 +8,21 @@ import br.ufc.ativufc.exception.NotFoundException;
 import br.ufc.ativufc.exception.OperationNotAllowedException;
 import br.ufc.ativufc.model.Curso;
 import br.ufc.ativufc.model.Discente;
-import br.ufc.ativufc.model.Perfil;
+import br.ufc.ativufc.model.enums.Perfil;
 import br.ufc.ativufc.model.Usuario;
 import br.ufc.ativufc.repository.CursoRepository;
 import br.ufc.ativufc.repository.DiscenteRepository;
 import br.ufc.ativufc.repository.UsuarioRepository;
+import br.ufc.ativufc.utils.PasswordValidator;
+import br.ufc.ativufc.utils.validation.CommonValidation;
+import br.ufc.ativufc.utils.validation.CursoValidation;
+import br.ufc.ativufc.utils.validation.DiscenteValidation;
 import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class DiscenteService {
@@ -34,17 +39,16 @@ public class DiscenteService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    // Cadastrar discente + usuário
     @Transactional
     public DiscenteResponse cadastrar(DiscenteRequest request) {
-        if (discenteRepository.existsByMatricula(request.matricula()))
-            throw new AlreadyExistsException("Discente já cadastrado com esta matrícula");
+        DiscenteValidation.validarMatriculaUnica(discenteRepository, request.matricula());
 
         Curso curso = cursoRepository.findById(request.idCurso())
                 .orElseThrow(() -> new NotFoundException("Curso não encontrado"));
+        CursoValidation.validarHorasCumpridas(curso, request.horasCumpridas());
 
-        if(request.horasCumpridas() != null && request.horasCumpridas() > curso.getTotalHorasComplementares())
-            throw new OperationNotAllowedException("Horas cumpridas iniciais não podem exceder o total de horas complementares do curso");
+        CommonValidation.validarEmailUnico(usuarioRepository, request.email());
+        CommonValidation.validarSenhaForte(request.senha());
 
         Usuario usuario = new Usuario(
                 null,
@@ -84,7 +88,7 @@ public class DiscenteService {
     }
 
     @Transactional
-    public DiscenteResponse atualizar(String matricula, AtualizarDiscenteRequest request) {
+    public DiscenteResponse atualizar(String matricula, UpdateDiscenteRequest request) {
         Discente discente = discenteRepository.findByMatricula(matricula)
                 .orElseThrow(() -> new NotFoundException("Discente não encontrado"));
 

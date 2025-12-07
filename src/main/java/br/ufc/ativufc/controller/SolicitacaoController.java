@@ -1,10 +1,10 @@
 package br.ufc.ativufc.controller;
 
-import br.ufc.ativufc.dto.request.AtualizarSolicitacaoRequest;
+import br.ufc.ativufc.dto.request.update.UpdateSolicitacaoRequest;
 import br.ufc.ativufc.dto.request.SolicitacaoRequest;
 import br.ufc.ativufc.dto.response.SolicitacaoResponse;
 import br.ufc.ativufc.dto.request.StatusRequest;
-import br.ufc.ativufc.model.Status;
+import br.ufc.ativufc.model.enums.Status;
 import br.ufc.ativufc.service.SolicitacaoService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -51,7 +51,7 @@ public class SolicitacaoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<SolicitacaoResponse> atualizar(@PathVariable Long id, @Valid @RequestBody AtualizarSolicitacaoRequest request) {
+    public ResponseEntity<SolicitacaoResponse> atualizar(@PathVariable Long id, @Valid @RequestBody UpdateSolicitacaoRequest request) {
         SolicitacaoResponse response = service.atualizar(id, request);
         return ResponseEntity.ok(response);
     }

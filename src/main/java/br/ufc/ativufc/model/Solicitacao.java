@@ -1,5 +1,7 @@
 package br.ufc.ativufc.model;
 
+import br.ufc.ativufc.model.enums.Status;
+import br.ufc.ativufc.model.enums.TipoParticipacao;
 import jakarta.persistence.*;
 import lombok.*;
 

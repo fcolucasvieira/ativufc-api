@@ -1,13 +1,14 @@
 package br.ufc.ativufc.service;
 
-import br.ufc.ativufc.dto.request.AtualizarSolicitacaoRequest;
+import br.ufc.ativufc.dto.request.update.UpdateSolicitacaoRequest;
 import br.ufc.ativufc.dto.request.SolicitacaoRequest;
 import br.ufc.ativufc.dto.request.StatusRequest;
 import br.ufc.ativufc.dto.response.SolicitacaoResponse;
 import br.ufc.ativufc.exception.NotFoundException;
-import br.ufc.ativufc.exception.OperationNotAllowedException;
 import br.ufc.ativufc.model.*;
+import br.ufc.ativufc.model.enums.Status;
 import br.ufc.ativufc.repository.*;
+import br.ufc.ativufc.utils.validation.SolicitacaoValidation;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -45,12 +46,8 @@ public class SolicitacaoService {
         Instituicao instituicao = instituicaoRepository.findById(request.idInstituicao())
                 .orElseThrow(() -> new NotFoundException("Instituição não encontrada"));
 
-        // Validações de negócio
-        if(request.dataFim().isBefore(request.dataInicio()))
-            throw new OperationNotAllowedException("Data fim não pode ser anterior à data início");
-
-        if(request.cargaHorariaTotal() > subtipo.getCargaHorariaMaxima())
-            throw new OperationNotAllowedException("Carga horária total não pode exceder o limite permitido");
+        SolicitacaoValidation.validarDatas(request.dataInicio(), request.dataFim());
+        SolicitacaoValidation.validarCargaHoraria(request.cargaHorariaTotal(), subtipo);
 
         Solicitacao solicitacao = new Solicitacao(
                 null,
@@ -102,47 +99,34 @@ public class SolicitacaoService {
     }
 
     @Transactional
-    public SolicitacaoResponse atualizar(Long id, AtualizarSolicitacaoRequest request) {
+    public SolicitacaoResponse atualizar(Long id, UpdateSolicitacaoRequest request) {
         Solicitacao solicitacao = solicitacaoRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Solicitação não encontrada"));
 
-        if (solicitacao.getStatus() != Status.PENDENTE) {
-            throw new OperationNotAllowedException("Solicitação só pode ser editada enquanto status estiver PENDENTE");
-        }
+        SolicitacaoValidation.validarStatusEditavel(solicitacao.getStatus());
 
-        // Validação e atualização da carga horária total
         if (request.cargaHorariaTotal() != null) {
-            if (request.cargaHorariaTotal() > solicitacao.getSubTipoAtividade().getCargaHorariaMaxima()) {
-                throw new OperationNotAllowedException("Carga horária total não pode exceder o limite permitido");
-            }
+            SolicitacaoValidation.validarCargaHoraria(request.cargaHorariaTotal(), solicitacao.getSubTipoAtividade());
             solicitacao.setCargaHorariaTotal(request.cargaHorariaTotal());
         }
 
-        // Validação de datas
         LocalDate novaDataInicio = request.dataInicio() != null ? request.dataInicio() : solicitacao.getDataInicio();
         LocalDate novaDataFim = request.dataFim() != null ? request.dataFim() : solicitacao.getDataFim();
 
-        if (novaDataInicio != null && novaDataFim != null && novaDataFim.isBefore(novaDataInicio)) {
-            throw new OperationNotAllowedException("Data fim não pode ser anterior à data início");
+        if (novaDataInicio != null && novaDataFim != null) {
+            SolicitacaoValidation.validarDatas(novaDataInicio, novaDataFim);
         }
 
-        if (request.dataInicio() != null) {
+        if (request.dataInicio() != null)
             solicitacao.setDataInicio(request.dataInicio());
-        }
-        if (request.dataFim() != null) {
+        if (request.dataFim() != null)
             solicitacao.setDataFim(request.dataFim());
-        }
-
-        // Atualização de campos opcionais
-        if (request.tipoParticipacao() != null) {
+        if (request.tipoParticipacao() != null)
             solicitacao.setTipoParticipacao(request.tipoParticipacao());
-        }
-        if (request.observacao() != null) {
+        if (request.observacao() != null)
             solicitacao.setObservacao(request.observacao());
-        }
-        if (request.comprovantePath() != null) {
+        if (request.comprovantePath() != null)
             solicitacao.setComprovantePath(request.comprovantePath());
-        }
 
         // Atualização de instituição
         if (request.idInstituicao() != null) {
@@ -155,12 +139,7 @@ public class SolicitacaoService {
         if (request.idSubtipoAtividade() != null) {
             SubtipoAtividade subtipo = subtipoRepository.findById(request.idSubtipoAtividade())
                     .orElseThrow(() -> new NotFoundException("Subtipo de atividade não encontrado"));
-
-            if (solicitacao.getCargaHorariaTotal() != null &&
-                    solicitacao.getCargaHorariaTotal() > subtipo.getCargaHorariaMaxima()) {
-                throw new OperationNotAllowedException("Carga horária total excede o limite do novo subtipo");
-            }
-
+            SolicitacaoValidation.validarCargaHoraria(solicitacao.getCargaHorariaTotal(), subtipo);
             solicitacao.setSubTipoAtividade(subtipo);
         }
 
@@ -175,17 +154,11 @@ public class SolicitacaoService {
         Solicitacao solicitacao = solicitacaoRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Solicitação não encontrada"));
 
-
         solicitacao.setStatus(request.status());
         solicitacao.setObservacaoResponsavel(request.observacaoResponsavel());
 
         if(request.status() == Status.DEFERIDA){
-            if (request.horasAproveitadas() == null) {
-                throw new OperationNotAllowedException("Horas aproveitadas devem ser informadas ao deferir a solicitação");
-            }
-            if (request.horasAproveitadas() > solicitacao.getCargaHorariaTotal()) {
-                throw new OperationNotAllowedException("Horas aproveitadas não podem exceder a carga horária total");
-            }
+            SolicitacaoValidation.validarHorasAproveitadas(request.horasAproveitadas(), solicitacao.getCargaHorariaTotal());
             solicitacao.setHorasAproveitadas(request.horasAproveitadas());
 
             Discente discente = solicitacao.getDiscente();
@@ -204,9 +177,7 @@ public class SolicitacaoService {
         Solicitacao solicitacao = solicitacaoRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Solicitação não encontrada"));
 
-        if (solicitacao.getStatus() != Status.PENDENTE) {
-            throw new OperationNotAllowedException("Só é possível remover solicitações com status PENDENTE");
-        }
+        SolicitacaoValidation.validarStatusRemovivel(solicitacao.getStatus());
 
         solicitacaoRepository.delete(solicitacao);
     }

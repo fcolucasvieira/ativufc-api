@@ -1,7 +1,7 @@
 package br.ufc.ativufc.dto.response;
 
-import br.ufc.ativufc.model.Status;
-import br.ufc.ativufc.model.TipoParticipacao;
+import br.ufc.ativufc.model.enums.Status;
+import br.ufc.ativufc.model.enums.TipoParticipacao;
 
 import java.time.LocalDate;
 

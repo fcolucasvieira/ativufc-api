@@ -6,6 +6,7 @@ import br.ufc.ativufc.exception.AlreadyExistsException;
 import br.ufc.ativufc.exception.NotFoundException;
 import br.ufc.ativufc.model.Instituicao;
 import br.ufc.ativufc.repository.InstituicaoRepository;
+import br.ufc.ativufc.utils.validation.InstituicaoValidation;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -21,11 +22,8 @@ public class InstituicaoService {
 
     @Transactional
     public InstituicaoResponse cadastrar(InstituicaoRequest request) {
-        if (repository.existsByCnpj(request.cnpj()))
-            throw new AlreadyExistsException("Instituição com este CNPJ já cadastrada");
-
-        if(repository.existsByNome(request.nome()))
-            throw new AlreadyExistsException("Instituição com este nome já cadastrada");
+        InstituicaoValidation.validarCnpjUnico(repository, request.cnpj());
+        InstituicaoValidation.validarNomeUnico(repository, request.nome());
 
         Instituicao instituicao = new Instituicao(null,
                 request.nome(),
@@ -38,7 +36,8 @@ public class InstituicaoService {
     }
 
     public InstituicaoResponse buscarPorId(Long id) {
-        Instituicao instituicao = repository.findById(id).orElseThrow(() -> new NotFoundException("Instituição não encontrada"));
+        Instituicao instituicao = repository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Instituição não encontrada"));
         return toResponse(instituicao);
     }
 

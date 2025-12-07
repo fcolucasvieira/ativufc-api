@@ -1,11 +1,11 @@
-package br.ufc.ativufc.dto.request;
+package br.ufc.ativufc.dto.request.update;
 
-import br.ufc.ativufc.model.TipoParticipacao;
+import br.ufc.ativufc.model.enums.TipoParticipacao;
 import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
 
-public record AtualizarSolicitacaoRequest(
+public record UpdateSolicitacaoRequest(
         Long idSubtipoAtividade,
         Long idInstituicao,
 

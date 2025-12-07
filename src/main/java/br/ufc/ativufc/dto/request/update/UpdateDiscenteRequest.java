@@ -1,9 +1,9 @@
-package br.ufc.ativufc.dto.request;
+package br.ufc.ativufc.dto.request.update;
 
 import jakarta.validation.constraints.*;
 import java.time.LocalDate;
 
-public record AtualizarDiscenteRequest(
+public record UpdateDiscenteRequest(
         String nome,
 
         @PastOrPresent

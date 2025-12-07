@@ -6,6 +6,7 @@ import br.ufc.ativufc.exception.AlreadyExistsException;
 import br.ufc.ativufc.exception.NotFoundException;
 import br.ufc.ativufc.model.SubtipoAtividade;
 import br.ufc.ativufc.repository.SubtipoRepository;
+import br.ufc.ativufc.utils.validation.SubtipoValidation;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,8 +20,7 @@ public class SubtipoService {
     }
 
     public SubtipoResponse cadastrar(SubtipoRequest request) {
-        if (repository.existsByDescricaoSubTipoAtividade(request.descricaoSubTipoAtividade()))
-            throw new AlreadyExistsException("Subtipo já cadastrado com esta descrição");
+        SubtipoValidation.validarDescricaoUnica(repository, request.descricaoSubTipoAtividade());
 
         SubtipoAtividade subtipo = new SubtipoAtividade(
                 null,
@@ -50,9 +50,7 @@ public class SubtipoService {
         if (request.descricaoSubTipoAtividade() != null &&
                 !subtipo.getDescricaoSubTipoAtividade().equals(request.descricaoSubTipoAtividade())) {
 
-            if (repository.existsByDescricaoSubTipoAtividade(request.descricaoSubTipoAtividade())) {
-                throw new AlreadyExistsException("Subtipo já cadastrado com esta descrição");
-            }
+            SubtipoValidation.validarDescricaoUnica(repository, request.descricaoSubTipoAtividade());
 
             subtipo.setDescricaoSubTipoAtividade(request.descricaoSubTipoAtividade());
         }

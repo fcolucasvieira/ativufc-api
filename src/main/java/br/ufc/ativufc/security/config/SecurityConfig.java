@@ -1,4 +1,4 @@
-package br.ufc.ativufc.config;
+package br.ufc.ativufc.security.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,6 +1,7 @@
 package br.ufc.ativufc.controller;
 
 import br.ufc.ativufc.dto.request.ResponsavelRequest;
+import br.ufc.ativufc.dto.request.update.UpdateResponsavelRequest;
 import br.ufc.ativufc.dto.response.ResponsavelResponse;
 import br.ufc.ativufc.service.ResponsavelService;
 import jakarta.validation.Valid;
@@ -37,7 +38,7 @@ public class ResponsavelController {
     }
 
     @PutMapping("/{siape}")
-    public ResponseEntity<ResponsavelResponse> atualizar(@PathVariable String siape, @Valid @RequestBody ResponsavelRequest request){
+    public ResponseEntity<ResponsavelResponse> atualizar(@PathVariable String siape, @Valid @RequestBody UpdateResponsavelRequest request){
         ResponsavelResponse response = service.atualizar(siape, request);
         return ResponseEntity.ok(response);
     }

@@ -2,8 +2,13 @@ package br.ufc.ativufc.service;
 
 import br.ufc.ativufc.dto.request.UsuarioRequest;
 import br.ufc.ativufc.dto.response.UsuarioResponse;
+import br.ufc.ativufc.exception.NotFoundException;
+import br.ufc.ativufc.model.enums.Perfil;
 import br.ufc.ativufc.model.Usuario;
 import br.ufc.ativufc.repository.UsuarioRepository;
+import br.ufc.ativufc.utils.validation.CommonValidation;
+import br.ufc.ativufc.utils.validation.UsuarioValidation;
+import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +25,14 @@ public class UsuarioService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public UsuarioResponse cadastrar(UsuarioRequest request) {
+    // Cadastro de ADMIN
+    @Transactional
+    public UsuarioResponse cadastrarAdmin(UsuarioRequest request) {
+        UsuarioValidation.validarPerfilAdmin(request.perfil());
+
+        CommonValidation.validarEmailUnico(repository, request.email());
+        CommonValidation.validarSenhaForte(request.senha());
+
         Usuario usuario = new Usuario(
                 null,
                 request.nome(),
@@ -33,15 +45,19 @@ public class UsuarioService {
         );
 
         repository.save(usuario);
-
         return toResponse(usuario);
     }
 
-
     public UsuarioResponse buscarPorId(Long id) {
-        return repository.findById(id)
-                .map(this::toResponse)
-                .orElse(null);
+        Usuario usuario = repository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
+        return toResponse(usuario);
+    }
+
+    public UsuarioResponse buscarPorEmail(String email){
+        Usuario usuario = repository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
+        return toResponse(usuario);
     }
 
     public List<UsuarioResponse> listarTodos() {
@@ -50,19 +66,38 @@ public class UsuarioService {
                 .toList();
     }
 
+    public List<UsuarioResponse> listarPorAtivo(boolean ativo){
+        return repository.findByAtivo(ativo).stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    @Transactional
     public UsuarioResponse atualizarAtivo(Long id, boolean ativo) {
         Usuario usuario = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
 
         usuario.setAtivo(ativo);
-        repository.save(usuario);
 
+        repository.save(usuario);
         return toResponse(usuario);
     }
 
+    @Transactional
+    public UsuarioResponse atualizarPerfil(Long id, Perfil perfil){
+        Usuario usuario = repository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
+
+        usuario.setPerfil(perfil);
+
+        repository.save(usuario);
+        return toResponse(usuario);
+    }
+
+    @Transactional
     public void remover(Long id) {
         Usuario usuario = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
 
         repository.delete(usuario);
     }

@@ -7,6 +7,7 @@ import br.ufc.ativufc.exception.NotFoundException;
 import br.ufc.ativufc.model.Curso;
 import br.ufc.ativufc.repository.CursoRepository;
 import br.ufc.ativufc.repository.DiscenteRepository;
+import br.ufc.ativufc.utils.validation.CursoValidation;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,8 +23,7 @@ public class CursoService {
     }
 
     public CursoResponse cadastrar(CursoRequest request){
-        if(cursoRepository.existsByNome(request.nome()))
-            throw new AlreadyExistsException("Curso já cadastrado com este nome");
+        CursoValidation.validarNomeUnico(cursoRepository, request.nome());
 
         Curso curso = new Curso(
                 null,
@@ -42,20 +42,17 @@ public class CursoService {
     }
 
     public List<CursoResponse> listarTodos(){
-        List<Curso> lista = cursoRepository.findAll();
-
-        if(lista.isEmpty())
-            throw new NotFoundException("Nenhum curso cadastrado");
-
-        return lista.stream().map(this::toResponse).toList();
+        return cursoRepository.findAll().stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     public CursoResponse atualizar(Long id, CursoRequest request){
         Curso curso = cursoRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Curso não encontrado"));
 
-        if(!curso.getNome().equals(request.nome()) && cursoRepository.existsByNome(request.nome()))
-            throw new AlreadyExistsException("Já existe curso com este nome");
+        if (!curso.getNome().equals(request.nome()))
+            CursoValidation.validarNomeUnico(cursoRepository, request.nome());
 
         curso.setNome(request.nome());
         curso.setTotalHorasComplementares(request.totalHorasComplementares());
@@ -68,9 +65,7 @@ public class CursoService {
         Curso curso = cursoRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Curso não encontrado"));
 
-        if(discenteRepository.existsByCurso(curso)) {
-            throw new IllegalStateException("Não é possível remover curso com discentes vinculados");
-        }
+        CursoValidation.validarDeleteSemDiscentes(discenteRepository, curso);
 
         cursoRepository.delete(curso);
     }

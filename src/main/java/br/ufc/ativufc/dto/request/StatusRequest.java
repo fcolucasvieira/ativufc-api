@@ -1,7 +1,6 @@
 package br.ufc.ativufc.dto.request;
 
-import br.ufc.ativufc.model.Status;
-import jakarta.validation.constraints.NotBlank;
+import br.ufc.ativufc.model.enums.Status;
 import jakarta.validation.constraints.NotNull;
 
 public record StatusRequest(

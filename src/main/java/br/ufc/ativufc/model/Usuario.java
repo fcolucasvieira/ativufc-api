@@ -1,5 +1,6 @@
 package br.ufc.ativufc.model;
 
+import br.ufc.ativufc.model.enums.Perfil;
 import jakarta.persistence.*;
 import lombok.*;
 

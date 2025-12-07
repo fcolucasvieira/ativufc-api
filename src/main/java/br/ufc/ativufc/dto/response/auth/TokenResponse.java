@@ -1,4 +1,4 @@
-package br.ufc.ativufc.dto.response;
+package br.ufc.ativufc.dto.response.auth;
 
 public record TokenResponse(
         String token,

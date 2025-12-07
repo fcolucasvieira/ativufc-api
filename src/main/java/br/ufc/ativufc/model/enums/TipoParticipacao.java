@@ -1,4 +1,4 @@
-package br.ufc.ativufc.model;
+package br.ufc.ativufc.model.enums;
 
 public enum TipoParticipacao {
     ORGANIZADOR("Membro da Equipe de Trabalho / Organizador"),

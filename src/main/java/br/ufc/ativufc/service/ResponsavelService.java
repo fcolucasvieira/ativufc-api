@@ -1,14 +1,16 @@
 package br.ufc.ativufc.service;
 
 import br.ufc.ativufc.dto.request.ResponsavelRequest;
+import br.ufc.ativufc.dto.request.update.UpdateResponsavelRequest;
 import br.ufc.ativufc.dto.response.ResponsavelResponse;
-import br.ufc.ativufc.exception.AlreadyExistsException;
 import br.ufc.ativufc.exception.NotFoundException;
-import br.ufc.ativufc.model.Perfil;
+import br.ufc.ativufc.model.enums.Perfil;
 import br.ufc.ativufc.model.Responsavel;
 import br.ufc.ativufc.model.Usuario;
 import br.ufc.ativufc.repository.ResponsavelRepository;
 import br.ufc.ativufc.repository.UsuarioRepository;
+import br.ufc.ativufc.utils.validation.CommonValidation;
+import br.ufc.ativufc.utils.validation.ResponsavelValidation;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -28,8 +30,10 @@ public class ResponsavelService {
     }
 
     public ResponsavelResponse cadastrar(ResponsavelRequest request) {
-        if(responsavelRepository.existsBySiape(request.siape()))
-            throw new AlreadyExistsException("Responsável com este siape já cadastrado");
+        ResponsavelValidation.validarSiapeUnico(responsavelRepository, request.siape());
+
+        CommonValidation.validarEmailUnico(usuarioRepository, request.email());
+        CommonValidation.validarSenhaForte(request.senha());
 
         Usuario usuario = new Usuario(
                 null,
@@ -37,7 +41,7 @@ public class ResponsavelService {
                 request.email(),
                 passwordEncoder.encode(request.senha()),
                 Perfil.RESPONSAVEL,
-                false, // inativo inicial (Admin ativa seu acesso)
+                false, // inativo inicial (ADMIN ativa acesso)
                 null,
                 null
         );
@@ -55,7 +59,6 @@ public class ResponsavelService {
     public ResponsavelResponse buscarPorSiape(String siape){
         Responsavel responsavel = responsavelRepository.findBySiape(siape)
                 .orElseThrow(() -> new NotFoundException("Responsável não encontrado"));
-
         return toResponse(responsavel);
     }
 
@@ -65,7 +68,7 @@ public class ResponsavelService {
                 .toList();
     }
 
-    public ResponsavelResponse atualizar(String siape, ResponsavelRequest request){
+    public ResponsavelResponse atualizar(String siape, UpdateResponsavelRequest request){
         Responsavel responsavel = responsavelRepository.findBySiape(siape)
                 .orElseThrow(() -> new NotFoundException("Responsável não encontrado"));
 
