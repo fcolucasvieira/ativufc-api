@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -24,7 +25,8 @@ public class UsuarioController {
     @PostMapping("/admin")
     public ResponseEntity<UsuarioResponse> cadastrarAdmin(@Valid @RequestBody UsuarioRequest request) {
         UsuarioResponse response = service.cadastrarAdmin(request);
-        return ResponseEntity.ok(response);
+        URI location = URI.create("/usuarios/" + response.id());
+        return ResponseEntity.created(location).body(response);
     }
 
     @GetMapping("/{id}")

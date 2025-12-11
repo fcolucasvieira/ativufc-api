@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -22,7 +23,8 @@ public class InstituicaoController {
     @PostMapping
     public ResponseEntity<InstituicaoResponse> cadastrar(@Valid @RequestBody InstituicaoRequest request) {
         InstituicaoResponse response = service.cadastrar(request);
-        return ResponseEntity.ok(response);
+        URI location = URI.create("/instituicoes/" + response.id());
+        return ResponseEntity.created(location).body(response);
     }
 
     @GetMapping("/{id}")

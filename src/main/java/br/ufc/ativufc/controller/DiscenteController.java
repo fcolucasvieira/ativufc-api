@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -22,7 +23,8 @@ public class DiscenteController {
     @PostMapping
     public ResponseEntity<DiscenteResponse> cadastrar(@Valid @RequestBody DiscenteRequest request) {
         DiscenteResponse response = service.cadastrar(request);
-        return ResponseEntity.ok(response);
+        URI location = URI.create("/discentes/" + response.matricula());
+        return ResponseEntity.created(location).body(response);
     }
 
     @GetMapping("/{matricula}")

@@ -4,12 +4,14 @@ import br.ufc.ativufc.dto.request.update.UpdateSolicitacaoRequest;
 import br.ufc.ativufc.dto.request.SolicitacaoRequest;
 import br.ufc.ativufc.dto.response.SolicitacaoResponse;
 import br.ufc.ativufc.dto.request.StatusRequest;
+import br.ufc.ativufc.model.Solicitacao;
 import br.ufc.ativufc.model.enums.Status;
 import br.ufc.ativufc.service.SolicitacaoService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -23,7 +25,9 @@ public class SolicitacaoController {
 
     @PostMapping
     public ResponseEntity<SolicitacaoResponse> cadastrar(@Valid @RequestBody SolicitacaoRequest request) {
-        return ResponseEntity.ok(service.cadastrar(request));
+        SolicitacaoResponse response = service.cadastrar(request);
+        URI location = URI.create("/solicitacoes/" + response.id());
+        return ResponseEntity.created(location).body(response);
     }
 
     @GetMapping("/{id}")

@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -21,7 +22,8 @@ public class SubtipoController {
     @PostMapping
     public ResponseEntity<SubtipoResponse> cadastrar(@Valid @RequestBody SubtipoRequest request) {
         SubtipoResponse response = service.cadastrar(request);
-        return ResponseEntity.ok(response);
+        URI location = URI.create("/subtipos/" + response.id());
+        return ResponseEntity.created(location).body(response);
     }
 
     @GetMapping("/{id}")
