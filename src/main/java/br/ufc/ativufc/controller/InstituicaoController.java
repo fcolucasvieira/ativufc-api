@@ -6,6 +6,7 @@ import br.ufc.ativufc.service.InstituicaoService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -28,12 +29,14 @@ public class InstituicaoController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('DISCENTE')")
     public ResponseEntity<InstituicaoResponse> buscarPorId(@PathVariable Long id) {
         InstituicaoResponse response = service.buscarPorId(id);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('DISCENTE')")
     public ResponseEntity<List<InstituicaoResponse>> listarTodas(){
         List<InstituicaoResponse> lista = service.listarTodas();
         return ResponseEntity.ok(lista);

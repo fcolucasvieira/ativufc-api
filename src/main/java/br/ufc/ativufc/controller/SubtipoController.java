@@ -5,6 +5,7 @@ import br.ufc.ativufc.dto.response.SubtipoResponse;
 import br.ufc.ativufc.service.SubtipoService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -27,12 +28,14 @@ public class SubtipoController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('DISCENTE')")
     public ResponseEntity<SubtipoResponse> buscarPorId(@PathVariable Long id){
         SubtipoResponse response = service.buscarPorId(id);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('DISCENTE')")
     public ResponseEntity<List<SubtipoResponse>> listarTodos() {
         List<SubtipoResponse> lista = service.listarTodos();
         return ResponseEntity.ok(lista);

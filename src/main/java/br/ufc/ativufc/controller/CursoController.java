@@ -5,6 +5,7 @@ import br.ufc.ativufc.dto.response.CursoResponse;
 import br.ufc.ativufc.service.CursoService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -28,12 +29,14 @@ public class CursoController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('DISCENTE')")
     public ResponseEntity<CursoResponse> buscarPorId(@PathVariable Long id) {
         CursoResponse response = service.buscarPorId(id);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('DISCENTE')")
     public ResponseEntity<List<CursoResponse>> listarTodos() {
         List<CursoResponse> lista = service.listarTodos();
         return ResponseEntity.ok(lista);

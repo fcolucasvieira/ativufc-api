@@ -2,6 +2,7 @@ package br.ufc.ativufc.repository;
 
 import br.ufc.ativufc.model.Curso;
 import br.ufc.ativufc.model.Discente;
+import br.ufc.ativufc.model.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
@@ -10,7 +11,11 @@ public interface DiscenteRepository extends JpaRepository<Discente, Long> {
 
     Optional<Discente> findByMatricula(String matricula);
 
+    Optional<Discente> findByUsuario(Usuario usuario);
+
     boolean existsByMatricula(String matricula);
 
     boolean existsByCurso(Curso curso);
+
+
 }

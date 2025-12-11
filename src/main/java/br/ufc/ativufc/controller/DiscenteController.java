@@ -6,6 +6,7 @@ import br.ufc.ativufc.dto.response.DiscenteResponse;
 import br.ufc.ativufc.service.DiscenteService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -27,7 +28,9 @@ public class DiscenteController {
         return ResponseEntity.created(location).body(response);
     }
 
+
     @GetMapping("/{matricula}")
+    @PreAuthorize("hasRole('DISCENTE')")
     public ResponseEntity<DiscenteResponse> buscarPorMatricula(@PathVariable String matricula) {
         DiscenteResponse response = service.buscarPorMatricula(matricula);
         return ResponseEntity.ok(response);
@@ -40,6 +43,7 @@ public class DiscenteController {
     }
 
     @PutMapping("/{matricula}")
+    @PreAuthorize("hasRole('DISCENTE')")
     public ResponseEntity<DiscenteResponse> atualizar(@PathVariable String matricula, @Valid @RequestBody UpdateDiscenteRequest request) {
         DiscenteResponse response = service.atualizar(matricula, request);
         return ResponseEntity.ok(response);

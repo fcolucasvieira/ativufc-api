@@ -9,6 +9,7 @@ import br.ufc.ativufc.model.enums.Status;
 import br.ufc.ativufc.service.SolicitacaoService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -24,6 +25,7 @@ public class SolicitacaoController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('DISCENTE')")
     public ResponseEntity<SolicitacaoResponse> cadastrar(@Valid @RequestBody SolicitacaoRequest request) {
         SolicitacaoResponse response = service.cadastrar(request);
         URI location = URI.create("/solicitacoes/" + response.id());
@@ -43,18 +45,21 @@ public class SolicitacaoController {
     }
 
     @GetMapping("/discente/{matricula}")
+    @PreAuthorize("hasRole('DISCENTE')")
     public ResponseEntity<List<SolicitacaoResponse>> listarPorMatricula(@PathVariable String matricula) {
         List<SolicitacaoResponse> lista = service.listarPorMatricula(matricula);
         return ResponseEntity.ok(lista);
     }
 
     @GetMapping("/status")
+    @PreAuthorize("hasRole('DISCENTE')")
     public ResponseEntity<List<SolicitacaoResponse>> listarPorStatus(@RequestParam Status status) {
         List<SolicitacaoResponse> lista = service.listarPorStatus(status);
         return ResponseEntity.ok(lista);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('DISCENTE')")
     public ResponseEntity<SolicitacaoResponse> atualizar(@PathVariable Long id, @Valid @RequestBody UpdateSolicitacaoRequest request) {
         SolicitacaoResponse response = service.atualizar(id, request);
         return ResponseEntity.ok(response);

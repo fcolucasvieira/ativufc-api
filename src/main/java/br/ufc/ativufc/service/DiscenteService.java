@@ -13,7 +13,6 @@ import br.ufc.ativufc.model.Usuario;
 import br.ufc.ativufc.repository.CursoRepository;
 import br.ufc.ativufc.repository.DiscenteRepository;
 import br.ufc.ativufc.repository.UsuarioRepository;
-import br.ufc.ativufc.utils.PasswordValidator;
 import br.ufc.ativufc.utils.validation.CommonValidation;
 import br.ufc.ativufc.utils.validation.CursoValidation;
 import br.ufc.ativufc.utils.validation.DiscenteValidation;
@@ -22,7 +21,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class DiscenteService {
