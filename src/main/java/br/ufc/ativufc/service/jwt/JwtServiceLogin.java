@@ -1,6 +1,7 @@
 package br.ufc.ativufc.service.jwt;
 
 import br.ufc.ativufc.exception.OperationNotAllowedException;
+import br.ufc.ativufc.model.Usuario; // ajuste conforme o nome da sua entidade de usuário
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -22,17 +23,37 @@ public class JwtServiceLogin {
         this.expiration = Duration.ofMinutes(ttlMinutes);
     }
 
-    public String gerarTokenLogin(String email, String perfil){
+    public String gerarTokenLogin(Usuario usuario){
         Instant now = Instant.now();
+
         return Jwts.builder()
-                .setSubject(email)
+                .setSubject(usuario.getEmail())
                 .setIssuer(base.getIssuer())
                 .setIssuedAt(Date.from(now))
                 .setExpiration(Date.from(now.plus(expiration)))
-                .claim("perfil", perfil)
+                .claim("perfil", usuario.getPerfil())
                 .claim("tipo", "login")
+                .claim(getIdentificadorKey(usuario.getPerfil().name()), getIdentificadorValue(usuario))
                 .signWith(base.getSecretKey(), SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    private String getIdentificadorKey(String perfil) {
+        switch (perfil) {
+            case "DISCENTE": return "matricula";
+            case "RESPONSAVEL": return "siape";
+            case "ADMIN": return "id";
+            default: return "id";
+        }
+    }
+
+    private Object getIdentificadorValue(Usuario usuario) {
+        switch (usuario.getPerfil().name()) {
+            case "DISCENTE": return usuario.getDiscente().getMatricula();
+            case "RESPONSAVEL": return usuario.getResponsavel().getSiape();
+            case "ADMIN": return usuario.getId();
+            default: return usuario.getId();
+        }
     }
 
     public String validarTokenLogin(String token){

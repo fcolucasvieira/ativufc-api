@@ -2,7 +2,7 @@ package br.ufc.ativufc.controller.auth;
 
 import br.ufc.ativufc.dto.request.auth.LoginRequest;
 import br.ufc.ativufc.dto.response.auth.ResetSenhaResponse;
-import br.ufc.ativufc.dto.response.auth.TokenResponse;
+import br.ufc.ativufc.dto.response.jwt.TokenResponse;
 import br.ufc.ativufc.service.auth.AuthenticationService;
 import br.ufc.ativufc.dto.request.auth.ConfirmResetRequest;
 import br.ufc.ativufc.dto.request.auth.ResetPasswordRequest;

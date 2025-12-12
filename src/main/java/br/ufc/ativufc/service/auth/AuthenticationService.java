@@ -1,14 +1,14 @@
 package br.ufc.ativufc.service.auth;
 
 import br.ufc.ativufc.dto.response.auth.ResetSenhaResponse;
-import br.ufc.ativufc.dto.response.auth.TokenResponse;
+import br.ufc.ativufc.dto.response.jwt.TokenResponse;
 import br.ufc.ativufc.exception.NotFoundException;
 import br.ufc.ativufc.exception.OperationNotAllowedException;
 import br.ufc.ativufc.model.Usuario;
 import br.ufc.ativufc.repository.UsuarioRepository;
 import br.ufc.ativufc.service.jwt.JwtServiceLogin;
 import br.ufc.ativufc.service.jwt.JwtServiceReset;
-import br.ufc.ativufc.utils.PasswordValidator;
+import br.ufc.ativufc.utils.validation.PasswordValidation;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -42,8 +42,24 @@ public class AuthenticationService {
             throw new BadCredentialsException("Credenciais inválidas");
         }
 
-        String token = jwtLoginService.gerarTokenLogin(usuario.getEmail(), usuario.getPerfil().name());
-        return new TokenResponse(token, usuario.getEmail(), usuario.getPerfil().name());
+        String token = jwtLoginService.gerarTokenLogin(usuario);
+
+        Object identificador;
+        switch (usuario.getPerfil().name()) {
+            case "DISCENTE":
+                identificador = usuario.getDiscente().getMatricula();
+                break;
+            case "RESPONSAVEL":
+                identificador = usuario.getResponsavel().getSiape();
+                break;
+            case "ADMIN":
+                identificador = usuario.getId();
+                break;
+            default:
+                identificador = usuario.getId();
+        }
+
+        return new TokenResponse(token, usuario.getEmail(), usuario.getPerfil().name(), identificador);
     }
 
     public String iniciarResetSenha(String email) {
@@ -58,7 +74,7 @@ public class AuthenticationService {
         Usuario usuario = repository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
 
-        List<String> falhas = PasswordValidator.validarSenha(novaSenha);
+        List<String> falhas = PasswordValidation.validarSenha(novaSenha);
         if (!falhas.isEmpty()) {
             String mensagem = "Senha inválida:\n" + falhas.stream()
                     .map(f -> "- " + f)

@@ -1,5 +1,6 @@
 package br.ufc.ativufc.security.config;
 
+import br.ufc.ativufc.security.filter.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -19,7 +20,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(
             org.springframework.security.config.annotation.web.builders.HttpSecurity http,
-            br.ufc.ativufc.utils.security.JwtAuthenticationFilter jwtAuthFilter
+            JwtAuthenticationFilter jwtAuthFilter
     ) throws Exception {
 
         return http

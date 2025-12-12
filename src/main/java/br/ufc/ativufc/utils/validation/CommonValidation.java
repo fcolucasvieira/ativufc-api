@@ -3,7 +3,6 @@ package br.ufc.ativufc.utils.validation;
 import br.ufc.ativufc.exception.AlreadyExistsException;
 import br.ufc.ativufc.exception.OperationNotAllowedException;
 import br.ufc.ativufc.repository.UsuarioRepository;
-import br.ufc.ativufc.utils.PasswordValidator;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,7 +14,7 @@ public class CommonValidation {
     }
 
     public static void validarSenhaForte(String senha){
-        List<String> falhas = PasswordValidator.validarSenha(senha);
+        List<String> falhas = PasswordValidation.validarSenha(senha);
         if (!falhas.isEmpty()) {
             String mensagem = "Senha inválida:\n" + falhas.stream()
                     .map(f -> "- " + f)

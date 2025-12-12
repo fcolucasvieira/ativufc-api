@@ -1,9 +1,9 @@
-package br.ufc.ativufc.utils;
+package br.ufc.ativufc.utils.validation;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PasswordValidator {
+public class PasswordValidation {
 
     public static List<String> validarSenha(String senha) {
         List<String> falhas = new ArrayList<>();

@@ -1,4 +1,4 @@
-package br.ufc.ativufc.utils.security;
+package br.ufc.ativufc.security.filter;
 
 import br.ufc.ativufc.service.jwt.JwtServiceBase;
 import jakarta.servlet.FilterChain;
