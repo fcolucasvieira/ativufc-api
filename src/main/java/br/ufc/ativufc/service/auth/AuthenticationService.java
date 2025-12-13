@@ -6,8 +6,7 @@ import br.ufc.ativufc.exception.NotFoundException;
 import br.ufc.ativufc.exception.OperationNotAllowedException;
 import br.ufc.ativufc.model.Usuario;
 import br.ufc.ativufc.repository.UsuarioRepository;
-import br.ufc.ativufc.service.jwt.JwtServiceLogin;
-import br.ufc.ativufc.service.jwt.JwtServiceReset;
+import br.ufc.ativufc.service.jwt.JwtService;
 import br.ufc.ativufc.utils.validation.PasswordValidation;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,17 +19,14 @@ import java.util.stream.Collectors;
 public class AuthenticationService {
 
     private final UsuarioRepository repository;
-    private final JwtServiceLogin jwtLoginService;
-    private final JwtServiceReset jwtResetService;
+    private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
 
     public AuthenticationService(UsuarioRepository repository,
-                                 JwtServiceLogin jwtLoginService,
-                                 JwtServiceReset jwtResetService,
+                                 JwtService jwtService,
                                  PasswordEncoder passwordEncoder) {
         this.repository = repository;
-        this.jwtLoginService = jwtLoginService;
-        this.jwtResetService = jwtResetService;
+        this.jwtService = jwtService;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -42,7 +38,7 @@ public class AuthenticationService {
             throw new BadCredentialsException("Credenciais inválidas");
         }
 
-        String token = jwtLoginService.gerarTokenLogin(usuario);
+        String token = jwtService.gerarTokenLogin(usuario);
 
         Object identificador;
         switch (usuario.getPerfil().name()) {
@@ -66,11 +62,11 @@ public class AuthenticationService {
         Usuario usuario = repository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
 
-        return jwtResetService.gerarTokenReset(usuario.getEmail());
+        return jwtService.gerarTokenReset(usuario.getEmail());
     }
 
     public ResetSenhaResponse concluirResetSenha(String token, String novaSenha) {
-        String email = jwtResetService.validarTokenReset(token);
+        String email = jwtService.validarTokenReset(token);
         Usuario usuario = repository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
 

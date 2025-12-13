@@ -30,7 +30,7 @@ public class DiscenteController {
 
 
     @GetMapping("/{matricula}")
-    @PreAuthorize("hasRole('DISCENTE')")
+    @PreAuthorize("hasRole('DISCENTE') and @securityUtil.isDiscenteOwner(#matricula)")
     public ResponseEntity<DiscenteResponse> buscarPorMatricula(@PathVariable String matricula) {
         DiscenteResponse response = service.buscarPorMatricula(matricula);
         return ResponseEntity.ok(response);
@@ -43,13 +43,14 @@ public class DiscenteController {
     }
 
     @PutMapping("/{matricula}")
-    @PreAuthorize("hasRole('DISCENTE')")
+    @PreAuthorize("hasRole('DISCENTE') and @securityUtil.isDiscenteOwner(#matricula)")
     public ResponseEntity<DiscenteResponse> atualizar(@PathVariable String matricula, @Valid @RequestBody UpdateDiscenteRequest request) {
         DiscenteResponse response = service.atualizar(matricula, request);
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{matricula}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> remover(@PathVariable String matricula){
         service.remover(matricula);
         return ResponseEntity.noContent().build();

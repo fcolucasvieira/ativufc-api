@@ -45,21 +45,20 @@ public class SolicitacaoController {
     }
 
     @GetMapping("/discente/{matricula}")
-    @PreAuthorize("hasRole('DISCENTE')")
+    @PreAuthorize("hasRole('DISCENTE') and @securityUtil.isDiscenteOwner(#matricula)")
     public ResponseEntity<List<SolicitacaoResponse>> listarPorMatricula(@PathVariable String matricula) {
         List<SolicitacaoResponse> lista = service.listarPorMatricula(matricula);
         return ResponseEntity.ok(lista);
     }
 
     @GetMapping("/status")
-    @PreAuthorize("hasRole('DISCENTE')")
     public ResponseEntity<List<SolicitacaoResponse>> listarPorStatus(@RequestParam Status status) {
         List<SolicitacaoResponse> lista = service.listarPorStatus(status);
         return ResponseEntity.ok(lista);
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('DISCENTE')")
+    @PreAuthorize("hasRole('DISCENTE') and @securityUtil.isDiscenteOwner(#matricula)")
     public ResponseEntity<SolicitacaoResponse> atualizar(@PathVariable Long id, @Valid @RequestBody UpdateSolicitacaoRequest request) {
         SolicitacaoResponse response = service.atualizar(id, request);
         return ResponseEntity.ok(response);

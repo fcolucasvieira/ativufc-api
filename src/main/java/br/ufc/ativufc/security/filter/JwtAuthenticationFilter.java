@@ -1,6 +1,6 @@
 package br.ufc.ativufc.security.filter;
 
-import br.ufc.ativufc.service.jwt.JwtServiceBase;
+import br.ufc.ativufc.service.jwt.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,9 +17,9 @@ import java.util.List;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtServiceBase jwtService;
+    private final JwtService jwtService;
 
-    public JwtAuthenticationFilter(JwtServiceBase jwtService) {
+    public JwtAuthenticationFilter(JwtService jwtService) {
         this.jwtService = jwtService;
     }
 
@@ -27,23 +27,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-        System.out.println("➡️ JwtAuthenticationFilter chamado para: " + request.getRequestURI());
 
         String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            System.out.println("❌ Nenhum header Authorization válido encontrado");
             filterChain.doFilter(request, response);
             return;
         }
 
         String token = authHeader.substring(7);
-        System.out.println("🔑 Token recebido: " + token);
 
-        boolean valido = jwtService.isTokenValido(token);
-        System.out.println("✅ Token válido? " + valido);
+        if (!jwtService.isTokenValido(token)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-        if (!valido) {
-            System.out.println("❌ Token rejeitado pelo JwtServiceBase");
+        try {
+            jwtService.validarTokenLogin(token);
+        } catch (Exception e) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -51,21 +51,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String email = jwtService.extrairEmail(token);
         String perfil = jwtService.extrairPerfil(token);
 
-        System.out.println("📧 Email extraído: " + email);
-        System.out.println("👤 Perfil extraído: " + perfil);
-
-        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+        if (email != null && perfil != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             List<SimpleGrantedAuthority> authorities =
-                    List.of(new SimpleGrantedAuthority("ROLE_" + perfil)); // casa com hasRole("DISCENTE")
+                    List.of(new SimpleGrantedAuthority("ROLE_" + perfil));
 
             UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(email, null, authorities);
+                    new UsernamePasswordAuthenticationToken(email, token, authorities);
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
-
-            System.out.println("✅ Autenticado: " + email + " com perfil: ROLE_" + perfil);
-        } else {
-            System.out.println("⚠️ Não foi possível autenticar: email nulo ou contexto já preenchido");
         }
 
         filterChain.doFilter(request, response);

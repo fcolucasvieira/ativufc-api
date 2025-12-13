@@ -28,14 +28,14 @@ public class SubtipoController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('DISCENTE')")
+    @PreAuthorize("hasAnyRole('DISCENTE','RESPONSAVEL','ADMIN')")
     public ResponseEntity<SubtipoResponse> buscarPorId(@PathVariable Long id){
         SubtipoResponse response = service.buscarPorId(id);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('DISCENTE')")
+    @PreAuthorize("hasAnyRole('DISCENTE','RESPONSAVEL','ADMIN')")
     public ResponseEntity<List<SubtipoResponse>> listarTodos() {
         List<SubtipoResponse> lista = service.listarTodos();
         return ResponseEntity.ok(lista);

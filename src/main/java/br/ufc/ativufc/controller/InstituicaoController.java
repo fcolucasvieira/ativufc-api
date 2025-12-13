@@ -29,14 +29,14 @@ public class InstituicaoController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('DISCENTE')")
+    @PreAuthorize("hasAnyRole('DISCENTE','RESPONSAVEL','ADMIN')")
     public ResponseEntity<InstituicaoResponse> buscarPorId(@PathVariable Long id) {
         InstituicaoResponse response = service.buscarPorId(id);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('DISCENTE')")
+    @PreAuthorize("hasAnyRole('DISCENTE','RESPONSAVEL','ADMIN')")
     public ResponseEntity<List<InstituicaoResponse>> listarTodas(){
         List<InstituicaoResponse> lista = service.listarTodas();
         return ResponseEntity.ok(lista);
