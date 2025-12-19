@@ -7,6 +7,7 @@ import java.time.LocalDate;
 
 public record UpdateSolicitacaoRequest(
         Long idSubtipoAtividade,
+
         Long idInstituicao,
 
         @Min(1)

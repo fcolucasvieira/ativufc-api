@@ -6,6 +6,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.nio.file.AccessDeniedException;
+
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -27,8 +29,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<String> handleValidationErrors(MethodArgumentNotValidException ex){
         String errorMessage = ex.getBindingResult().getFieldErrors().stream()
-                .map(error -> error.getField() + ": " + error.getDefaultMessage())
-                .reduce((msg1, msg2) -> msg1 + ";\n" + msg2)
+                .map(error -> "- " + error.getField() + ": " + error.getDefaultMessage() + ".")
+                .reduce((msg1, msg2) -> msg1 + "\n" + msg2)
                 .orElse("Erro de validação");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
     }

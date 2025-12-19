@@ -4,9 +4,11 @@ import br.ufc.ativufc.dto.request.ResponsavelRequest;
 import br.ufc.ativufc.dto.request.update.UpdateResponsavelRequest;
 import br.ufc.ativufc.dto.response.ResponsavelResponse;
 import br.ufc.ativufc.exception.NotFoundException;
+import br.ufc.ativufc.model.Instituicao;
 import br.ufc.ativufc.model.enums.Perfil;
 import br.ufc.ativufc.model.Responsavel;
 import br.ufc.ativufc.model.Usuario;
+import br.ufc.ativufc.repository.InstituicaoRepository;
 import br.ufc.ativufc.repository.ResponsavelRepository;
 import br.ufc.ativufc.repository.UsuarioRepository;
 import br.ufc.ativufc.utils.validation.CommonValidation;
@@ -20,17 +22,22 @@ import java.util.List;
 public class ResponsavelService {
 
     private final ResponsavelRepository responsavelRepository;
+    private final InstituicaoRepository instituicaoRepository;
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public ResponsavelService(ResponsavelRepository responsavelRepository, UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
+    public ResponsavelService(ResponsavelRepository responsavelRepository, InstituicaoRepository instituicaoRepository, UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
         this.responsavelRepository = responsavelRepository;
+        this.instituicaoRepository = instituicaoRepository;
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
     public ResponsavelResponse cadastrar(ResponsavelRequest request) {
         ResponsavelValidation.validarSiapeUnico(responsavelRepository, request.siape());
+
+        Instituicao instituicao = instituicaoRepository.findById(request.idInstituicao())
+                        .orElseThrow(() -> new NotFoundException("Instituição não encontrada"));
 
         CommonValidation.validarEmailUnico(usuarioRepository, request.email());
         CommonValidation.validarSenhaForte(request.senha());
@@ -49,6 +56,8 @@ public class ResponsavelService {
         Responsavel responsavel = new Responsavel(
                 request.siape(),
                 request.nome(),
+                instituicao,
+                request.cargo(),
                 usuario
         );
 
@@ -72,7 +81,19 @@ public class ResponsavelService {
         Responsavel responsavel = responsavelRepository.findBySiape(siape)
                 .orElseThrow(() -> new NotFoundException("Responsável não encontrado"));
 
-        responsavel.setNome(request.nome());
+        if (request.nome() != null && !request.nome().isBlank()) {
+            responsavel.setNome(request.nome());
+        }
+
+        if (request.idInstituicao() != null) {
+            Instituicao instituicao = instituicaoRepository.findById(request.idInstituicao())
+                    .orElseThrow(() -> new NotFoundException("Instituição não encontrada"));
+            responsavel.setInstituicao(instituicao);
+        }
+
+        if(request.cargo() != null){
+            responsavel.setCargo(request.cargo());
+        }
 
         responsavelRepository.save(responsavel);
         return toResponse(responsavel);
@@ -82,6 +103,8 @@ public class ResponsavelService {
         return new ResponsavelResponse(
                 responsavel.getSiape(),
                 responsavel.getNome(),
+                responsavel.getInstituicao().getNome(),
+                responsavel.getCargo(),
                 responsavel.getUsuario().getEmail(),
                 responsavel.getUsuario().isAtivo()
         );

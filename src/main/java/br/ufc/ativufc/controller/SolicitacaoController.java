@@ -4,7 +4,6 @@ import br.ufc.ativufc.dto.request.update.UpdateSolicitacaoRequest;
 import br.ufc.ativufc.dto.request.SolicitacaoRequest;
 import br.ufc.ativufc.dto.response.SolicitacaoResponse;
 import br.ufc.ativufc.dto.request.StatusRequest;
-import br.ufc.ativufc.model.Solicitacao;
 import br.ufc.ativufc.model.enums.Status;
 import br.ufc.ativufc.service.SolicitacaoService;
 import jakarta.validation.Valid;
@@ -25,46 +24,50 @@ public class SolicitacaoController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('DISCENTE')")
+    @PreAuthorize("hasRole('DISCENTE') and @securityUtil.isDiscenteOwner(#request.matriculaDiscente)")
     public ResponseEntity<SolicitacaoResponse> cadastrar(@Valid @RequestBody SolicitacaoRequest request) {
         SolicitacaoResponse response = service.cadastrar(request);
         URI location = URI.create("/solicitacoes/" + response.id());
         return ResponseEntity.created(location).body(response);
-    }
+      }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('RESPONSAVEL')")
     public ResponseEntity<SolicitacaoResponse> buscarPorId(@PathVariable Long id) {
         SolicitacaoResponse response = service.buscarPorId(id);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('RESPONSAVEL')")
     public ResponseEntity<List<SolicitacaoResponse>> listarTodos() {
         List<SolicitacaoResponse> lista = service.listarTodos();
         return ResponseEntity.ok(lista);
     }
 
     @GetMapping("/discente/{matricula}")
-    @PreAuthorize("hasRole('DISCENTE') and @securityUtil.isDiscenteOwner(#matricula)")
+    @PreAuthorize("(hasRole('DISCENTE') and @securityUtil.isDiscenteOwner(#matricula)) or hasRole('RESPONSAVEL')")
     public ResponseEntity<List<SolicitacaoResponse>> listarPorMatricula(@PathVariable String matricula) {
         List<SolicitacaoResponse> lista = service.listarPorMatricula(matricula);
         return ResponseEntity.ok(lista);
     }
 
     @GetMapping("/status")
+    @PreAuthorize("hasRole('RESPONSAVEL')")
     public ResponseEntity<List<SolicitacaoResponse>> listarPorStatus(@RequestParam Status status) {
         List<SolicitacaoResponse> lista = service.listarPorStatus(status);
         return ResponseEntity.ok(lista);
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('DISCENTE') and @securityUtil.isDiscenteOwner(#matricula)")
+    @PreAuthorize("hasRole('DISCENTE') and @securityUtil.isSolicitacaoOwner(#id)")
     public ResponseEntity<SolicitacaoResponse> atualizar(@PathVariable Long id, @Valid @RequestBody UpdateSolicitacaoRequest request) {
         SolicitacaoResponse response = service.atualizar(id, request);
         return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/{id}/status")
+    @PreAuthorize("hasRole('RESPONSAVEL')")
     public ResponseEntity<SolicitacaoResponse> atualizarStatus(@PathVariable Long id, @Valid @RequestBody StatusRequest request) {
         SolicitacaoResponse response = service.atualizarStatus(id, request);
         return ResponseEntity.ok(response);

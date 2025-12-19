@@ -123,9 +123,9 @@ public class SolicitacaoService {
             solicitacao.setDataFim(request.dataFim());
         if (request.tipoParticipacao() != null)
             solicitacao.setTipoParticipacao(request.tipoParticipacao());
-        if (request.observacao() != null)
+        if (request.observacao() != null && !request.observacao().isBlank())
             solicitacao.setObservacao(request.observacao());
-        if (request.comprovantePath() != null)
+        if (request.comprovantePath() != null && !request.comprovantePath().isBlank())
             solicitacao.setComprovantePath(request.comprovantePath());
 
         // Atualização de instituição

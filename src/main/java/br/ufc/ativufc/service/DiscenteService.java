@@ -90,7 +90,7 @@ public class DiscenteService {
         Discente discente = discenteRepository.findByMatricula(matricula)
                 .orElseThrow(() -> new NotFoundException("Discente não encontrado"));
 
-        if (request.nome() != null) {
+        if (request.nome() != null && !request.nome().isBlank()) {
             discente.setNome(request.nome());
         }
 

@@ -14,7 +14,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(prePostEnabled = true) // se você usa @PreAuthorize
+@EnableMethodSecurity(prePostEnabled = true) // @PreAuthorize
 public class SecurityConfig {
 
     @Bean
@@ -32,18 +32,12 @@ public class SecurityConfig {
                         // públicas
                         .requestMatchers("/auth/login", "/auth/requestReset", "/auth/confirmReset").permitAll()
                         .requestMatchers(HttpMethod.POST, "/discentes").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/responsaveis").permitAll()
                         .requestMatchers(HttpMethod.POST, "/cursos").permitAll()
                         .requestMatchers(HttpMethod.POST, "/instituicoes").permitAll()
                         .requestMatchers(HttpMethod.POST, "/subtipos").permitAll()
 
-                        // protegidas por role DISCENTE
-                        .requestMatchers("/discentes/**").hasRole("DISCENTE")
-                        .requestMatchers(HttpMethod.GET, "/cursos/**").hasRole("DISCENTE")
-                        .requestMatchers(HttpMethod.GET, "/instituicoes/**").hasRole("DISCENTE")
-                        .requestMatchers("/solicitacoes/**").hasRole("DISCENTE")
-                        .requestMatchers(HttpMethod.GET, "/subtipos/**").hasRole("DISCENTE")
-
-                        // qualquer outra
+                        // qualquer outra rota
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)

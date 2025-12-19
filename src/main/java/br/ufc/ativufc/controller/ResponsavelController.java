@@ -6,6 +6,7 @@ import br.ufc.ativufc.dto.response.ResponsavelResponse;
 import br.ufc.ativufc.service.ResponsavelService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -28,6 +29,7 @@ public class ResponsavelController {
     }
 
     @GetMapping("/{siape}")
+    @PreAuthorize("hasRole('RESPONSAVEL') and @securityUtil.isResponsavelOwner(#siape)")
     public ResponseEntity<ResponsavelResponse> buscarPorSiape(@PathVariable String siape){
         ResponsavelResponse response = service.buscarPorSiape(siape);
         return ResponseEntity.ok(response);
