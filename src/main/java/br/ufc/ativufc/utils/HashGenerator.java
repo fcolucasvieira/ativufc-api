@@ -1,4 +1,4 @@
-package br.ufc.ativufc.utils.validation;
+package br.ufc.ativufc.utils;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
