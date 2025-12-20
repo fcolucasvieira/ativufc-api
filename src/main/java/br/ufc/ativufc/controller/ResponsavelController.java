@@ -36,12 +36,14 @@ public class ResponsavelController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<ResponsavelResponse>> listarTodos(){
         List<ResponsavelResponse> lista = service.listarTodos();
         return ResponseEntity.ok(lista);
     }
 
     @PutMapping("/{siape}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponsavelResponse> atualizar(@PathVariable String siape, @Valid @RequestBody UpdateResponsavelRequest request){
         ResponsavelResponse response = service.atualizar(siape, request);
         return ResponseEntity.ok(response);

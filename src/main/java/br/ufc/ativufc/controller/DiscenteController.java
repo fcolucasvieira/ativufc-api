@@ -37,12 +37,14 @@ public class DiscenteController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<DiscenteResponse>> listarTodos() {
         List<DiscenteResponse> lista = service.listarTodos();
         return ResponseEntity.ok(lista);
     }
 
     @PutMapping("/{matricula}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<DiscenteResponse> atualizar(@PathVariable String matricula, @Valid @RequestBody UpdateDiscenteRequest request) {
         DiscenteResponse response = service.atualizar(matricula, request);
         return ResponseEntity.ok(response);

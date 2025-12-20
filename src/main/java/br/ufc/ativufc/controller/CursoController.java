@@ -22,6 +22,7 @@ public class CursoController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CursoResponse> cadastrar(@Valid @RequestBody CursoRequest request) {
         CursoResponse response = service.cadastrar(request);
         URI location = URI.create("/cursos/" + response.id());
@@ -43,12 +44,14 @@ public class CursoController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CursoResponse> atualizar(@PathVariable Long id, @Valid @RequestBody CursoRequest request) {
         CursoResponse response = service.atualizar(id, request);
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> remover(@PathVariable Long id) {
         service.remover(id);
         return ResponseEntity.noContent().build();

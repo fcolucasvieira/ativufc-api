@@ -22,6 +22,7 @@ public class InstituicaoController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<InstituicaoResponse> cadastrar(@Valid @RequestBody InstituicaoRequest request) {
         InstituicaoResponse response = service.cadastrar(request);
         URI location = URI.create("/instituicoes/" + response.id());
@@ -41,4 +42,6 @@ public class InstituicaoController {
         List<InstituicaoResponse> lista = service.listarTodas();
         return ResponseEntity.ok(lista);
     }
+
+    // fazer PUT E DELETE (próxs atualizações)
 }

@@ -21,6 +21,7 @@ public class SubtipoController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<SubtipoResponse> cadastrar(@Valid @RequestBody SubtipoRequest request) {
         SubtipoResponse response = service.cadastrar(request);
         URI location = URI.create("/subtipos/" + response.id());
@@ -42,16 +43,16 @@ public class SubtipoController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<SubtipoResponse> atualizar(@PathVariable Long id, @Valid @RequestBody SubtipoRequest request){
         SubtipoResponse response = service.atualizar(id, request);
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> remover(@PathVariable Long id){
         service.remover(id);
         return ResponseEntity.noContent().build();
     }
-
-
 }

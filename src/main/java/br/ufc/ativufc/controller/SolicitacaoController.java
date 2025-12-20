@@ -32,28 +32,28 @@ public class SolicitacaoController {
       }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('RESPONSAVEL')")
+    @PreAuthorize("hasRole('RESPONSAVEL') or hasRole('ADMIN')")
     public ResponseEntity<SolicitacaoResponse> buscarPorId(@PathVariable Long id) {
         SolicitacaoResponse response = service.buscarPorId(id);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('RESPONSAVEL')")
+    @PreAuthorize("hasRole('RESPONSAVEL') or hasRole('ADMIN')")
     public ResponseEntity<List<SolicitacaoResponse>> listarTodos() {
         List<SolicitacaoResponse> lista = service.listarTodos();
         return ResponseEntity.ok(lista);
     }
 
     @GetMapping("/discente/{matricula}")
-    @PreAuthorize("(hasRole('DISCENTE') and @securityUtil.isDiscenteOwner(#matricula)) or hasRole('RESPONSAVEL')")
+    @PreAuthorize("(hasRole('DISCENTE') and @securityUtil.isDiscenteOwner(#matricula)) or hasRole('RESPONSAVEL') or hasRole('ADMIN')")
     public ResponseEntity<List<SolicitacaoResponse>> listarPorMatricula(@PathVariable String matricula) {
         List<SolicitacaoResponse> lista = service.listarPorMatricula(matricula);
         return ResponseEntity.ok(lista);
     }
 
     @GetMapping("/status")
-    @PreAuthorize("hasRole('RESPONSAVEL')")
+    @PreAuthorize("hasRole('RESPONSAVEL') or hasRole('ADMIN')")
     public ResponseEntity<List<SolicitacaoResponse>> listarPorStatus(@RequestParam Status status) {
         List<SolicitacaoResponse> lista = service.listarPorStatus(status);
         return ResponseEntity.ok(lista);
@@ -74,6 +74,7 @@ public class SolicitacaoController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> remover(@PathVariable Long id){
         service.remover(id);
         return ResponseEntity.noContent().build();

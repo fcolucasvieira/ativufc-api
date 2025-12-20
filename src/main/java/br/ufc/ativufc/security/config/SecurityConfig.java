@@ -24,22 +24,27 @@ public class SecurityConfig {
     ) throws Exception {
 
         return http
-                // Desativa CSRF e session state
                 .csrf(csrf -> csrf.disable())
-                .headers(headers -> headers.frameOptions(frame -> frame.disable()))
-                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .cors(cors -> {})
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // públicas
-                        .requestMatchers("/auth/login", "/auth/requestReset", "/auth/confirmReset").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/reset-password/request").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/reset-password/confirm").permitAll()
                         .requestMatchers(HttpMethod.POST, "/discentes").permitAll()
                         .requestMatchers(HttpMethod.POST, "/responsaveis").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/cursos").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/instituicoes").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/subtipos").permitAll()
 
-                        // qualquer outra rota
+
+                        // H2 Console (testes)
+                        .requestMatchers("/h2-console/**").permitAll()
+
+                        // autenticadas via token JWT
                         .anyRequest().authenticated()
                 )
+                // H2 Console (testes)
+                .headers(headers -> headers.frameOptions(frame -> frame.disable()))
+
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
