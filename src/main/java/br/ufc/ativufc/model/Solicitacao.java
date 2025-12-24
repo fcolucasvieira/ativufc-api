@@ -2,6 +2,8 @@ package br.ufc.ativufc.model;
 
 import br.ufc.ativufc.model.enums.Status;
 import br.ufc.ativufc.model.enums.TipoParticipacao;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -58,6 +60,7 @@ public class Solicitacao {
     @Column(length = 350)
     private String observacaoResponsavel;
 
-    @Column(nullable = false)
-    private String comprovantePath;
+    @OneToOne(mappedBy = "solicitacao", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private Comprovante comprovante;
 }

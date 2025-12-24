@@ -7,6 +7,9 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.nio.file.AccessDeniedException;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -19,11 +22,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AlreadyExistsException.class)
     public ResponseEntity<String> handleAlreadyExists(AlreadyExistsException ex){
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
-    }
-
-    @ExceptionHandler(OperationNotAllowedException.class)
-    public ResponseEntity<String> handleOperationNotAllowed(OperationNotAllowedException ex){
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

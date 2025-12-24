@@ -22,8 +22,6 @@ public record UpdateSolicitacaoRequest(
         TipoParticipacao tipoParticipacao,
 
         @Size(max = 350)
-        String observacao,
-
-        String comprovantePath
+        String observacao
 ) {
 }

@@ -20,6 +20,6 @@ public record SolicitacaoResponse(
         Status status,
         String observacao,
         String observacaoResponsavel,
-        String comprovantePath
+        ComprovanteResponse comprovante
 ) {}
 

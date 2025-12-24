@@ -8,6 +8,7 @@ import br.ufc.ativufc.model.Curso;
 import br.ufc.ativufc.repository.CursoRepository;
 import br.ufc.ativufc.repository.DiscenteRepository;
 import br.ufc.ativufc.utils.validation.CursoValidation;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,6 +23,7 @@ public class CursoService {
         this.discenteRepository = discenteRepository;
     }
 
+    @Transactional
     public CursoResponse cadastrar(CursoRequest request){
         CursoValidation.validarNomeUnico(cursoRepository, request.nome());
 
@@ -47,6 +49,7 @@ public class CursoService {
                 .toList();
     }
 
+    @Transactional
     public CursoResponse atualizar(Long id, CursoRequest request){
         Curso curso = cursoRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Curso não encontrado"));
@@ -61,6 +64,7 @@ public class CursoService {
         return toResponse(curso);
     }
 
+    @Transactional
     public void remover(Long id){
         Curso curso = cursoRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Curso não encontrado"));

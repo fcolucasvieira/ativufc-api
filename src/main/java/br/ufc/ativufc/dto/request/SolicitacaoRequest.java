@@ -32,9 +32,5 @@ public record SolicitacaoRequest(
 
         @NotBlank
         @Size(max = 350)
-        String observacao,
-
-        @NotBlank
-        String comprovantePath
-
+        String observacao
 ) {}

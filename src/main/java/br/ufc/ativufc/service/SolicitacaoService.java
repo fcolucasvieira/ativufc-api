@@ -3,6 +3,7 @@ package br.ufc.ativufc.service;
 import br.ufc.ativufc.dto.request.update.UpdateSolicitacaoRequest;
 import br.ufc.ativufc.dto.request.SolicitacaoRequest;
 import br.ufc.ativufc.dto.request.StatusRequest;
+import br.ufc.ativufc.dto.response.ComprovanteResponse;
 import br.ufc.ativufc.dto.response.SolicitacaoResponse;
 import br.ufc.ativufc.exception.NotFoundException;
 import br.ufc.ativufc.model.*;
@@ -22,17 +23,21 @@ public class SolicitacaoService {
     private final DiscenteRepository discenteRepository;
     private final SubtipoRepository subtipoRepository;
     private final InstituicaoRepository instituicaoRepository;
+    private final ComprovanteService comprovanteService;
 
     public SolicitacaoService(
             SolicitacaoRepository solicitacaoRepository,
             DiscenteRepository discenteRepository,
             SubtipoRepository subtipoRepository,
-            InstituicaoRepository instituicaoRepository
+            InstituicaoRepository instituicaoRepository,
+            ComprovanteService comprovanteService
+
     ) {
         this.solicitacaoRepository = solicitacaoRepository;
         this.discenteRepository = discenteRepository;
         this.subtipoRepository = subtipoRepository;
         this.instituicaoRepository = instituicaoRepository;
+        this.comprovanteService = comprovanteService;
     }
 
     @Transactional
@@ -63,7 +68,7 @@ public class SolicitacaoService {
                 Status.PENDENTE,
                 request.observacao(),
                 null,
-                request.comprovantePath()
+                null
         );
 
         solicitacaoRepository.save(solicitacao);
@@ -125,8 +130,6 @@ public class SolicitacaoService {
             solicitacao.setTipoParticipacao(request.tipoParticipacao());
         if (request.observacao() != null && !request.observacao().isBlank())
             solicitacao.setObservacao(request.observacao());
-        if (request.comprovantePath() != null && !request.comprovantePath().isBlank())
-            solicitacao.setComprovantePath(request.comprovantePath());
 
         // Atualização de instituição
         if (request.idInstituicao() != null) {
@@ -184,6 +187,10 @@ public class SolicitacaoService {
 
 
     public SolicitacaoResponse toResponse(Solicitacao solicitacao) {
+        ComprovanteResponse comprovanteResponse = null;
+        if (solicitacao.getComprovante() != null)
+            comprovanteResponse = comprovanteService.toResponse(solicitacao.getComprovante());
+
         return new SolicitacaoResponse(
                 solicitacao.getId(),
                 solicitacao.getDiscente().getMatricula(),
@@ -199,7 +206,7 @@ public class SolicitacaoService {
                 solicitacao.getStatus(),
                 solicitacao.getObservacao(),
                 solicitacao.getObservacaoResponsavel(),
-                solicitacao.getComprovantePath()
+                comprovanteResponse
         );
     }
 }
