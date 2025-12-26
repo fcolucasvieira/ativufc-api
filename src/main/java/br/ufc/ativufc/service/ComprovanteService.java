@@ -10,6 +10,7 @@ import br.ufc.ativufc.repository.SolicitacaoRepository;
 import br.ufc.ativufc.utils.validation.ComprovanteValidation;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.PathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -65,6 +66,19 @@ public class ComprovanteService {
         return toResponse(comprovante);
     }
 
+    public PathResource carregarArquivo(Long id){
+        Comprovante comprovante = comprovanteRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Comprovante não encontrado"));
+
+        Path path = Paths.get(comprovante.getCaminho());
+
+        if(!Files.exists(path) || !Files.isReadable(path))
+            throw new NotFoundException("Arquivo não encontrado ou não pode ser lido");
+
+        return new PathResource(path);
+    }
+
+
     public ComprovanteResponse buscarPorId(Long id) {
         Comprovante comprovante = comprovanteRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Comprovante não encontrado"));
@@ -84,14 +98,14 @@ public class ComprovanteService {
 
         ComprovanteValidation.validarArquivo(file);
 
-        Comprovante comprovanteAntigo = solicitacao.getComprovante();
-        if(comprovanteAntigo != null){
-            try {
-                Files.deleteIfExists(Paths.get(comprovanteAntigo.getCaminho()));
-            } catch(IOException ex){
-                throw new OperationNotAllowedException("Erro ao remover arquivo antigo");
-            }
-            comprovanteRepository.delete(comprovanteAntigo);
+        Comprovante comprovante = solicitacao.getComprovante();
+
+        ComprovanteValidation.validarArquivoAntigo(comprovante);
+
+        try {
+            Files.deleteIfExists(Paths.get(comprovante.getCaminho()));
+        } catch (IOException ex) {
+            throw new OperationNotAllowedException("Erro ao remover arquivo antigo");
         }
 
         Path destino = Paths.get(uploadDir, file.getOriginalFilename());
@@ -101,20 +115,18 @@ public class ComprovanteService {
             throw new OperationNotAllowedException("Erro ao salvar arquivo");
         }
 
-        Comprovante comprovanteNovo = new Comprovante(
-                null,
-                destino.toString(),
-                file.getOriginalFilename(),
-                file.getContentType(),
-                file.getSize(),
-                LocalDateTime.now(),
-                solicitacao
-        );
+        comprovante.setCaminho(destino.toString());
+        comprovante.setNomeOriginal(file.getOriginalFilename());
+        comprovante.setContentType(file.getContentType());
+        comprovante.setTamanho(file.getSize());
+        comprovante.setUploadAt(LocalDateTime.now());
 
-        solicitacao.setComprovante(comprovanteNovo);
-        comprovanteRepository.save(comprovanteNovo);
-        return toResponse(comprovanteNovo);
+        comprovanteRepository.save(comprovante);
+
+        return toResponse(comprovante);
     }
+
+
 
     public ComprovanteResponse toResponse(Comprovante comprovante) {
         return new ComprovanteResponse(comprovante.getId(),

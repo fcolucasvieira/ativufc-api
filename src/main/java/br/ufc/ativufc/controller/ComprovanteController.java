@@ -2,7 +2,10 @@ package br.ufc.ativufc.controller;
 
 import br.ufc.ativufc.dto.response.ComprovanteResponse;
 import br.ufc.ativufc.service.ComprovanteService;
-import jakarta.transaction.Transactional;
+import org.springframework.core.io.PathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +27,19 @@ public class ComprovanteController {
     public ResponseEntity<ComprovanteResponse> upload(@PathVariable Long solicitacaoId, @RequestParam("file")MultipartFile file){
         ComprovanteResponse response = service.upload(solicitacaoId, file);
         return ResponseEntity.ok(response);
+    }
+
+    @PreAuthorize("(hasRole('DISCENTE') and @securityUtil.isComprovanteOwner(#id)) or hasRole('RESPONSAVEL')")
+    @GetMapping("/{id}/download")
+    public ResponseEntity<Resource> download(@PathVariable Long id) {
+        ComprovanteResponse response = service.buscarPorId(id);
+        PathResource resource = service.carregarArquivo(id);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(response.contentType()))
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "inline; filename=\"" + response.nomeOriginal() + "\"")
+                .body(resource);
     }
 
     @PreAuthorize("hasRole('RESPONSAVEL') or hasRole('ADMIN')")

@@ -36,7 +36,7 @@ public class Comprovante {
     private LocalDateTime uploadAt;
 
     @OneToOne
-    @JoinColumn(name = "solicitacao_id", nullable = false)
+    @JoinColumn(name = "solicitacao_id", unique = true, nullable = false)
     @JsonBackReference
     private Solicitacao solicitacao;
 }

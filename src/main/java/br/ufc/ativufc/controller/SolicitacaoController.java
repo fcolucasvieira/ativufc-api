@@ -29,7 +29,7 @@ public class SolicitacaoController {
         SolicitacaoResponse response = service.cadastrar(request);
         URI location = URI.create("/solicitacoes/" + response.id());
         return ResponseEntity.created(location).body(response);
-      }
+    }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('RESPONSAVEL') or hasRole('ADMIN')")
@@ -75,7 +75,7 @@ public class SolicitacaoController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> remover(@PathVariable Long id){
+    public ResponseEntity<Void> remover(@PathVariable Long id) {
         service.remover(id);
         return ResponseEntity.noContent().build();
     }
