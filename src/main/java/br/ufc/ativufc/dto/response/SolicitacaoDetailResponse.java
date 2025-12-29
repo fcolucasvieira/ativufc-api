@@ -5,7 +5,7 @@ import br.ufc.ativufc.model.enums.TipoParticipacao;
 
 import java.time.LocalDate;
 
-public record SolicitacaoResponse(
+public record SolicitacaoDetailResponse(
         Long id,
         String matriculaDiscente,
         String nomeDiscente,
@@ -20,6 +20,6 @@ public record SolicitacaoResponse(
         Status status,
         String observacao,
         String observacaoResponsavel,
-        ComprovanteResponse comprovante
+        Long comprovanteId
 ) {}
 

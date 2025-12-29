@@ -3,8 +3,8 @@ package br.ufc.ativufc.service;
 import br.ufc.ativufc.dto.request.update.UpdateSolicitacaoRequest;
 import br.ufc.ativufc.dto.request.SolicitacaoRequest;
 import br.ufc.ativufc.dto.request.StatusRequest;
-import br.ufc.ativufc.dto.response.ComprovanteResponse;
-import br.ufc.ativufc.dto.response.SolicitacaoResponse;
+import br.ufc.ativufc.dto.response.SolicitacaoDetailResponse;
+import br.ufc.ativufc.dto.response.SolicitacaoSummaryResponse;
 import br.ufc.ativufc.exception.NotFoundException;
 import br.ufc.ativufc.model.*;
 import br.ufc.ativufc.model.enums.Status;
@@ -41,7 +41,7 @@ public class SolicitacaoService {
     }
 
     @Transactional
-    public SolicitacaoResponse cadastrar(SolicitacaoRequest request) {
+    public SolicitacaoDetailResponse cadastrar(SolicitacaoRequest request) {
         Discente discente = discenteRepository.findByMatricula(request.matriculaDiscente())
                 .orElseThrow(() -> new NotFoundException("Discente não encontrado"));
 
@@ -72,39 +72,39 @@ public class SolicitacaoService {
         );
 
         solicitacaoRepository.save(solicitacao);
-        return toResponse(solicitacao);
+        return toDetailResponse(solicitacao);
     }
 
-    public SolicitacaoResponse buscarPorId(Long id){
+    public SolicitacaoDetailResponse buscarPorId(Long id){
         Solicitacao solicitacao = solicitacaoRepository.findById(id)
             .orElseThrow(() -> new NotFoundException("Solicitação não encontrada"));
 
-        return toResponse(solicitacao);
+        return toDetailResponse(solicitacao);
     }
 
-    public List<SolicitacaoResponse> listarTodos() {
+    public List<SolicitacaoSummaryResponse> listarTodos() {
         return solicitacaoRepository.findAll().stream()
-                .map(this::toResponse)
+                .map(this::toSummaryResponse)
                 .toList();
     }
 
-    public List<SolicitacaoResponse> listarPorMatricula(String matricula) {
+    public List<SolicitacaoSummaryResponse> listarPorMatricula(String matricula) {
         Discente discente = discenteRepository.findByMatricula(matricula)
                 .orElseThrow(() -> new NotFoundException("Discente não encontrado"));
 
         return solicitacaoRepository.findByDiscente(discente).stream()
-                .map(this::toResponse)
+                .map(this::toSummaryResponse)
                 .toList();
     }
 
-    public List<SolicitacaoResponse> listarPorStatus(Status status){
+    public List<SolicitacaoSummaryResponse> listarPorStatus(Status status){
         return solicitacaoRepository.findByStatus(status).stream()
-                .map(this::toResponse)
+                .map(this::toSummaryResponse)
                 .toList();
     }
 
     @Transactional
-    public SolicitacaoResponse atualizar(Long id, UpdateSolicitacaoRequest request) {
+    public SolicitacaoDetailResponse atualizar(Long id, UpdateSolicitacaoRequest request) {
         Solicitacao solicitacao = solicitacaoRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Solicitação não encontrada"));
 
@@ -147,13 +147,13 @@ public class SolicitacaoService {
         }
 
         solicitacaoRepository.save(solicitacao);
-        return toResponse(solicitacao);
+        return toDetailResponse(solicitacao);
     }
 
 
 
     @Transactional
-    public SolicitacaoResponse atualizarStatus(Long id, StatusRequest request){
+    public SolicitacaoDetailResponse atualizarStatus(Long id, StatusRequest request){
         Solicitacao solicitacao = solicitacaoRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Solicitação não encontrada"));
 
@@ -172,7 +172,7 @@ public class SolicitacaoService {
         }
 
         solicitacaoRepository.save(solicitacao);
-        return toResponse(solicitacao);
+        return toDetailResponse(solicitacao);
     }
 
     @Transactional
@@ -185,13 +185,19 @@ public class SolicitacaoService {
         solicitacaoRepository.delete(solicitacao);
     }
 
+    public SolicitacaoSummaryResponse toSummaryResponse(Solicitacao solicitacao){
+        return new SolicitacaoSummaryResponse(
+        solicitacao.getId(),
+        solicitacao.getDiscente().getNome(),
+        solicitacao.getSubTipoAtividade().getDescricaoSubTipoAtividade(),
+        solicitacao.getStatus(),
+        solicitacao.getDataSolicitacao(),
+        solicitacao.getComprovante() != null ? solicitacao.getComprovante().getId() : null
+        );
+    }
 
-    public SolicitacaoResponse toResponse(Solicitacao solicitacao) {
-        ComprovanteResponse comprovanteResponse = null;
-        if (solicitacao.getComprovante() != null)
-            comprovanteResponse = comprovanteService.toResponse(solicitacao.getComprovante());
-
-        return new SolicitacaoResponse(
+    public SolicitacaoDetailResponse toDetailResponse(Solicitacao solicitacao) {
+        return new SolicitacaoDetailResponse(
                 solicitacao.getId(),
                 solicitacao.getDiscente().getMatricula(),
                 solicitacao.getDiscente().getNome(),
@@ -206,7 +212,7 @@ public class SolicitacaoService {
                 solicitacao.getStatus(),
                 solicitacao.getObservacao(),
                 solicitacao.getObservacaoResponsavel(),
-                comprovanteResponse
+                solicitacao.getComprovante() != null ? solicitacao.getComprovante().getId() : null
         );
     }
 }
