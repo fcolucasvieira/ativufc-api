@@ -43,13 +43,6 @@ public class CursoController {
         return ResponseEntity.ok(lista);
     }
 
-    @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<CursoResponse> atualizar(@PathVariable Long id, @Valid @RequestBody CursoRequest request) {
-        CursoResponse response = service.atualizar(id, request);
-        return ResponseEntity.ok(response);
-    }
-
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> remover(@PathVariable Long id) {

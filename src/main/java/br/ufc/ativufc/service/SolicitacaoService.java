@@ -1,8 +1,7 @@
 package br.ufc.ativufc.service;
 
-import br.ufc.ativufc.dto.request.update.UpdateSolicitacaoRequest;
 import br.ufc.ativufc.dto.request.SolicitacaoRequest;
-import br.ufc.ativufc.dto.request.StatusRequest;
+import br.ufc.ativufc.dto.request.AnaliseSolicitacaoRequest;
 import br.ufc.ativufc.dto.response.SolicitacaoDetailResponse;
 import br.ufc.ativufc.dto.response.SolicitacaoSummaryResponse;
 import br.ufc.ativufc.exception.NotFoundException;
@@ -23,63 +22,61 @@ public class SolicitacaoService {
     private final DiscenteRepository discenteRepository;
     private final SubtipoRepository subtipoRepository;
     private final InstituicaoRepository instituicaoRepository;
-    private final ComprovanteService comprovanteService;
 
     public SolicitacaoService(
             SolicitacaoRepository solicitacaoRepository,
             DiscenteRepository discenteRepository,
             SubtipoRepository subtipoRepository,
-            InstituicaoRepository instituicaoRepository,
-            ComprovanteService comprovanteService
-
+            InstituicaoRepository instituicaoRepository
     ) {
         this.solicitacaoRepository = solicitacaoRepository;
         this.discenteRepository = discenteRepository;
         this.subtipoRepository = subtipoRepository;
         this.instituicaoRepository = instituicaoRepository;
-        this.comprovanteService = comprovanteService;
     }
 
     @Transactional
     public SolicitacaoDetailResponse cadastrar(SolicitacaoRequest request) {
+        // 1. Validar entidades
         Discente discente = discenteRepository.findByMatricula(request.matriculaDiscente())
                 .orElseThrow(() -> new NotFoundException("Discente não encontrado"));
 
-        SubtipoAtividade subtipo = subtipoRepository.findById(request.idSubtipoAtividade())
-                .orElseThrow(() -> new NotFoundException("Subtipo de atividade não encontrado"));
+        Subtipo subtipo = subtipoRepository.findById(request.subtipoId())
+                .orElseThrow(() -> new NotFoundException("Subtipo não encontrado"));
 
-        Instituicao instituicao = instituicaoRepository.findById(request.idInstituicao())
+        Instituicao instituicao = instituicaoRepository.findById(request.instituicaoId())
                 .orElseThrow(() -> new NotFoundException("Instituição não encontrada"));
 
+        // 2. Validar dados
         SolicitacaoValidation.validarDatas(request.dataInicio(), request.dataFim());
-        SolicitacaoValidation.validarCargaHoraria(request.cargaHorariaTotal(), subtipo);
+        SolicitacaoValidation.validarCargaHoraria(request.cargaHorariaSolicitada(), subtipo);
 
-        Solicitacao solicitacao = new Solicitacao(
+        Solicitacao s = new Solicitacao(
                 null,
                 discente,
                 subtipo,
                 instituicao,
-                request.tipoParticipacao(),
-                request.cargaHorariaTotal(),
-                null,
+                request.participacao(),
+                request.cargaHorariaSolicitada(),
+                0,
                 request.dataInicio(),
                 request.dataFim(),
-                java.time.LocalDate.now(),
+                LocalDate.now(),
                 Status.PENDENTE,
-                request.observacao(),
+                request.observacaoDiscente(),
                 null,
                 null
         );
 
-        solicitacaoRepository.save(solicitacao);
-        return toDetailResponse(solicitacao);
+        solicitacaoRepository.save(s);
+        return toDetailResponse(s);
     }
 
     public SolicitacaoDetailResponse buscarPorId(Long id){
-        Solicitacao solicitacao = solicitacaoRepository.findById(id)
+        Solicitacao s = solicitacaoRepository.findById(id)
             .orElseThrow(() -> new NotFoundException("Solicitação não encontrada"));
 
-        return toDetailResponse(solicitacao);
+        return toDetailResponse(s);
     }
 
     public List<SolicitacaoSummaryResponse> listarTodos() {
@@ -104,115 +101,74 @@ public class SolicitacaoService {
     }
 
     @Transactional
-    public SolicitacaoDetailResponse atualizar(Long id, UpdateSolicitacaoRequest request) {
-        Solicitacao solicitacao = solicitacaoRepository.findById(id)
+    public SolicitacaoDetailResponse atualizarStatus(Long id, AnaliseSolicitacaoRequest request){
+        Solicitacao s = solicitacaoRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Solicitação não encontrada"));
 
-        SolicitacaoValidation.validarStatusEditavel(solicitacao.getStatus());
-
-        if (request.cargaHorariaTotal() != null) {
-            SolicitacaoValidation.validarCargaHoraria(request.cargaHorariaTotal(), solicitacao.getSubTipoAtividade());
-            solicitacao.setCargaHorariaTotal(request.cargaHorariaTotal());
-        }
-
-        LocalDate novaDataInicio = request.dataInicio() != null ? request.dataInicio() : solicitacao.getDataInicio();
-        LocalDate novaDataFim = request.dataFim() != null ? request.dataFim() : solicitacao.getDataFim();
-
-        if (novaDataInicio != null && novaDataFim != null) {
-            SolicitacaoValidation.validarDatas(novaDataInicio, novaDataFim);
-        }
-
-        if (request.dataInicio() != null)
-            solicitacao.setDataInicio(request.dataInicio());
-        if (request.dataFim() != null)
-            solicitacao.setDataFim(request.dataFim());
-        if (request.tipoParticipacao() != null)
-            solicitacao.setTipoParticipacao(request.tipoParticipacao());
-        if (request.observacao() != null && !request.observacao().isBlank())
-            solicitacao.setObservacao(request.observacao());
-
-        // Atualização de instituição
-        if (request.idInstituicao() != null) {
-            Instituicao instituicao = instituicaoRepository.findById(request.idInstituicao())
-                    .orElseThrow(() -> new NotFoundException("Instituição não encontrada"));
-            solicitacao.setInstituicao(instituicao);
-        }
-
-        // Atualização de subtipo com validação
-        if (request.idSubtipoAtividade() != null) {
-            SubtipoAtividade subtipo = subtipoRepository.findById(request.idSubtipoAtividade())
-                    .orElseThrow(() -> new NotFoundException("Subtipo de atividade não encontrado"));
-            SolicitacaoValidation.validarCargaHoraria(solicitacao.getCargaHorariaTotal(), subtipo);
-            solicitacao.setSubTipoAtividade(subtipo);
-        }
-
-        solicitacaoRepository.save(solicitacao);
-        return toDetailResponse(solicitacao);
-    }
-
-
-
-    @Transactional
-    public SolicitacaoDetailResponse atualizarStatus(Long id, StatusRequest request){
-        Solicitacao solicitacao = solicitacaoRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Solicitação não encontrada"));
-
-        solicitacao.setStatus(request.status());
-        solicitacao.setObservacaoResponsavel(request.observacaoResponsavel());
+        // Atualiza status e observação de responsável
+        s.setStatus(request.status());
+        s.setObservacaoResponsavel(request.observacaoResponsavel());
 
         if(request.status() == Status.DEFERIDA){
-            SolicitacaoValidation.validarHorasAproveitadas(request.horasAproveitadas(), solicitacao.getCargaHorariaTotal());
-            solicitacao.setHorasAproveitadas(request.horasAproveitadas());
+            SolicitacaoValidation.validarHorasAproveitadas(request.cargaHorariaAproveitada(), s.getCargaHorariaSolicitada());
 
-            Discente discente = solicitacao.getDiscente();
-            discente.setHorasCumpridas(discente.getHorasCumpridas() + solicitacao.getHorasAproveitadas());
+            s.setCargaHorariaAproveitada(request.cargaHorariaAproveitada());
+
+            Discente discente = s.getDiscente();
+
+            discente.setHorasCumpridas(discente.getHorasCumpridas() + s.getCargaHorariaAproveitada());
             discenteRepository.save(discente);
+
         } else if(request.status() == Status.INDEFERIDA){
-            solicitacao.setHorasAproveitadas(0);
+            s.setCargaHorariaAproveitada(0);
         }
 
-        solicitacaoRepository.save(solicitacao);
-        return toDetailResponse(solicitacao);
+        solicitacaoRepository.save(s);
+        return toDetailResponse(s);
     }
 
     @Transactional
     public void remover(Long id) {
-        Solicitacao solicitacao = solicitacaoRepository.findById(id)
+        Solicitacao s = solicitacaoRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Solicitação não encontrada"));
 
-        SolicitacaoValidation.validarStatusRemovivel(solicitacao.getStatus());
+        SolicitacaoValidation.validarStatusRemovivel(s.getStatus());
 
-        solicitacaoRepository.delete(solicitacao);
+        solicitacaoRepository.delete(s);
     }
 
-    public SolicitacaoSummaryResponse toSummaryResponse(Solicitacao solicitacao){
+    public SolicitacaoSummaryResponse toSummaryResponse(Solicitacao s){
         return new SolicitacaoSummaryResponse(
-        solicitacao.getId(),
-        solicitacao.getDiscente().getNome(),
-        solicitacao.getSubTipoAtividade().getDescricaoSubTipoAtividade(),
-        solicitacao.getStatus(),
-        solicitacao.getDataSolicitacao(),
-        solicitacao.getComprovante() != null ? solicitacao.getComprovante().getId() : null
+        s.getId(),
+        s.getDiscente().getNome(),
+        s.getSubtipo().getAtividade().getNome(),
+        s.getSubtipo().getDescricao(),
+        s.getParticipacao(),
+        s.getCargaHorariaSolicitada(),
+        s.getStatus(),
+        s.getDataSolicitacao(),
+        s.getComprovante() != null ? s.getComprovante().getId() : null
         );
     }
 
-    public SolicitacaoDetailResponse toDetailResponse(Solicitacao solicitacao) {
+    public SolicitacaoDetailResponse toDetailResponse(Solicitacao s) {
         return new SolicitacaoDetailResponse(
-                solicitacao.getId(),
-                solicitacao.getDiscente().getMatricula(),
-                solicitacao.getDiscente().getNome(),
-                solicitacao.getInstituicao().getNome(),
-                solicitacao.getSubTipoAtividade().getDescricaoSubTipoAtividade(),
-                solicitacao.getTipoParticipacao(),
-                solicitacao.getCargaHorariaTotal(),
-                solicitacao.getHorasAproveitadas(),
-                solicitacao.getDataInicio(),
-                solicitacao.getDataFim(),
-                solicitacao.getDataSolicitacao(),
-                solicitacao.getStatus(),
-                solicitacao.getObservacao(),
-                solicitacao.getObservacaoResponsavel(),
-                solicitacao.getComprovante() != null ? solicitacao.getComprovante().getId() : null
+                s.getId(),
+                s.getDiscente().getNome(),
+                s.getDiscente().getMatricula(),
+                s.getInstituicao().getNome(),
+                s.getSubtipo().getAtividade().getNome(),
+                s.getSubtipo().getDescricao(),
+                s.getParticipacao(),
+                s.getCargaHorariaSolicitada(),
+                s.getCargaHorariaAproveitada(),
+                s.getDataInicio(),
+                s.getDataFim(),
+                s.getDataSolicitacao(),
+                s.getStatus(),
+                s.getObservacaoDiscente(),
+                s.getObservacaoResponsavel(),
+                s.getComprovante() != null ? s.getComprovante().getId() : null
         );
     }
 }

@@ -10,17 +10,17 @@ public record SolicitacaoRequest(
         String matriculaDiscente,
 
         @NotNull
-        Long idSubtipoAtividade,
+        Long subtipoId,
 
         @NotNull
-        Long idInstituicao,
+        Long instituicaoId,
 
         @NotNull
-        TipoParticipacao tipoParticipacao,
+        TipoParticipacao participacao,
 
         @NotNull
         @Min(1)
-        Integer cargaHorariaTotal,
+        Integer cargaHorariaSolicitada,
 
         @NotNull
         @PastOrPresent
@@ -32,5 +32,5 @@ public record SolicitacaoRequest(
 
         @NotBlank
         @Size(max = 350)
-        String observacao
+        String observacaoDiscente
 ) {}

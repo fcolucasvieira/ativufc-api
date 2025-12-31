@@ -1,6 +1,7 @@
 package br.ufc.ativufc.controller;
 
 import br.ufc.ativufc.dto.request.InstituicaoRequest;
+import br.ufc.ativufc.dto.request.update.UpdateInstituicaoRequest;
 import br.ufc.ativufc.dto.response.InstituicaoResponse;
 import br.ufc.ativufc.service.InstituicaoService;
 import jakarta.transaction.Transactional;
@@ -43,5 +44,18 @@ public class InstituicaoController {
         return ResponseEntity.ok(lista);
     }
 
-    // fazer PUT E DELETE (próxs atualizações)
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<InstituicaoResponse> atualizar(@PathVariable Long id, @Valid @RequestBody UpdateInstituicaoRequest request) {
+        InstituicaoResponse response = service.atualizar(id, request);
+        return ResponseEntity.ok(response);
+    }
+
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> remover(@PathVariable Long id) {
+        service.remover(id);
+        return ResponseEntity.noContent().build();
+    }
 }

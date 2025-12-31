@@ -2,24 +2,23 @@ package br.ufc.ativufc.dto.response;
 
 import br.ufc.ativufc.model.enums.Status;
 import br.ufc.ativufc.model.enums.TipoParticipacao;
-
 import java.time.LocalDate;
 
 public record SolicitacaoDetailResponse(
         Long id,
-        String matriculaDiscente,
         String nomeDiscente,
+        String matriculaDiscente,
         String nomeInstituicao,
-        String subtipoAtividade,
-        TipoParticipacao tipoParticipacao,
-        Integer cargaHorariaTotal,
-        Integer horasAproveitadas,
+        String nomeAtividade,
+        String nomeSubtipo,
+        TipoParticipacao participacao,
+        Integer cargaHorariaSolicitada,
+        Integer cargaHorariaAproveitada,
         LocalDate dataInicio,
         LocalDate dataFim,
         LocalDate dataSolicitacao,
         Status status,
-        String observacao,
+        String observacaoDiscente,
         String observacaoResponsavel,
         Long comprovanteId
 ) {}
-

@@ -1,6 +1,7 @@
 package br.ufc.ativufc.utils.validation;
 
 import br.ufc.ativufc.exception.AlreadyExistsException;
+import br.ufc.ativufc.model.Instituicao;
 import br.ufc.ativufc.repository.InstituicaoRepository;
 
 public class InstituicaoValidation {

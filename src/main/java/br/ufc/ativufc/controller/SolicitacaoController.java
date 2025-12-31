@@ -1,9 +1,8 @@
 package br.ufc.ativufc.controller;
 
-import br.ufc.ativufc.dto.request.update.UpdateSolicitacaoRequest;
 import br.ufc.ativufc.dto.request.SolicitacaoRequest;
 import br.ufc.ativufc.dto.response.SolicitacaoDetailResponse;
-import br.ufc.ativufc.dto.request.StatusRequest;
+import br.ufc.ativufc.dto.request.AnaliseSolicitacaoRequest;
 import br.ufc.ativufc.dto.response.SolicitacaoSummaryResponse;
 import br.ufc.ativufc.model.enums.Status;
 import br.ufc.ativufc.service.SolicitacaoService;
@@ -33,7 +32,7 @@ public class SolicitacaoController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('RESPONSAVEL') or hasRole('ADMIN')")
+    @PreAuthorize("(hasRole('DISCENTE') and @securityUtil.isSolicitacaoOwner(#id)) or hasRole('RESPONSAVEL') or hasRole('ADMIN')")
     public ResponseEntity<SolicitacaoDetailResponse> buscarPorId(@PathVariable Long id) {
         SolicitacaoDetailResponse response = service.buscarPorId(id);
         return ResponseEntity.ok(response);
@@ -60,16 +59,9 @@ public class SolicitacaoController {
         return ResponseEntity.ok(lista);
     }
 
-    @PutMapping("/{id}")
-    @PreAuthorize("hasRole('DISCENTE') and @securityUtil.isSolicitacaoOwner(#id)")
-    public ResponseEntity<SolicitacaoDetailResponse> atualizar(@PathVariable Long id, @Valid @RequestBody UpdateSolicitacaoRequest request) {
-        SolicitacaoDetailResponse response = service.atualizar(id, request);
-        return ResponseEntity.ok(response);
-    }
-
     @PatchMapping("/{id}/status")
     @PreAuthorize("hasRole('RESPONSAVEL')")
-    public ResponseEntity<SolicitacaoDetailResponse> atualizarStatus(@PathVariable Long id, @Valid @RequestBody StatusRequest request) {
+    public ResponseEntity<SolicitacaoDetailResponse> atualizarStatus(@PathVariable Long id, @Valid @RequestBody AnaliseSolicitacaoRequest request) {
         SolicitacaoDetailResponse response = service.atualizarStatus(id, request);
         return ResponseEntity.ok(response);
     }

@@ -6,9 +6,16 @@ import jakarta.validation.constraints.NotNull;
 
 public record SubtipoRequest(
         @NotBlank
-        String descricaoSubTipoAtividade,
+        String descricao,
 
         @NotNull
         @Min(1)
-        Integer cargaHorariaMaxima
+        Integer horasMin,
+
+        @NotNull
+        @Min(1)
+        Integer horasMax,
+
+        @NotNull
+        Long atividadeId
 ) {}
