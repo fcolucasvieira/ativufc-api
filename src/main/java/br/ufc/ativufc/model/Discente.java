@@ -24,6 +24,9 @@ public class Discente {
     @Column(nullable = false)
     private LocalDate ingressao;
 
+    @Column
+    private String telefone;
+
     @ManyToOne(optional = false)
     private Curso curso;
 
@@ -38,4 +41,5 @@ public class Discente {
         int restantes = curso.getTotalHorasComplementares() - horasCumpridas;
         return Math.max(restantes, 0);
     }
+
 }

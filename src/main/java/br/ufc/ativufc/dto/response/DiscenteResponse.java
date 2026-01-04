@@ -10,5 +10,6 @@ public record DiscenteResponse(
         String cursoNome,
         Integer totalHorasComplementares,
         Integer horasCumpridas,
-        Integer horasRestantes
+        Integer horasRestantes,
+        String telefone
 ) {}

@@ -28,7 +28,6 @@ public class DiscenteController {
         return ResponseEntity.created(location).body(response);
     }
 
-
     @GetMapping("/{matricula}")
     @PreAuthorize("(hasRole('DISCENTE') and @securityUtil.isDiscenteOwner(#matricula)) or hasRole('RESPONSAVEL')")
     public ResponseEntity<DiscenteResponse> buscarPorMatricula(@PathVariable String matricula) {
@@ -43,11 +42,17 @@ public class DiscenteController {
         return ResponseEntity.ok(lista);
     }
 
-    @PutMapping("/{matricula}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<DiscenteResponse> atualizar(@PathVariable String matricula, @Valid @RequestBody UpdateDiscenteRequest request) {
-        DiscenteResponse response = service.atualizar(matricula, request);
-        return ResponseEntity.ok(response);
+    @PutMapping("/{matricula}/perfil")
+    @PreAuthorize("hasRole('DISCENTE') and @securityUtil.isDiscenteOwner(#matricula)")
+    public ResponseEntity<DiscenteResponse> atualizarPerfil(@PathVariable String matricula, @RequestBody br.ufc.ativufc.dto.request.DiscenteUpdateDTO dto) {
+        return ResponseEntity.ok(service.atualizarPerfil(matricula, dto));
+    }
+
+    @PatchMapping("/{matricula}/senha")
+    @PreAuthorize("hasRole('DISCENTE') and @securityUtil.isDiscenteOwner(#matricula)")
+    public ResponseEntity<Void> alterarSenha(@PathVariable String matricula, @RequestBody br.ufc.ativufc.dto.request.AlterarSenhaDTO dto) {
+        service.alterarSenha(matricula, dto);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{matricula}")
