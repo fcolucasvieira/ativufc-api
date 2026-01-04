@@ -2,6 +2,8 @@ package br.ufc.ativufc.dto.response;
 
 public record SubtipoResponse(
     Long id,
-    String descricaoSubTipoAtividade,
-    Integer cargaHorariaMaxima
+    String descricao,
+    Integer horasMin,
+    Integer horasMax,
+    String atividadeNome
 ) {}

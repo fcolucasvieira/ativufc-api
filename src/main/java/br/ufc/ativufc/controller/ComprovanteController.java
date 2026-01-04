@@ -22,7 +22,7 @@ public class ComprovanteController {
         this.service = service;
     }
 
-    @PreAuthorize("hasRole('DISCENTE')")
+    @PreAuthorize("hasRole('DISCENTE') and @securityUtil.isSolicitacaoOwner(#solicitacaoId)")
     @PostMapping("/{solicitacaoId}")
     public ResponseEntity<ComprovanteResponse> upload(@PathVariable Long solicitacaoId, @RequestParam("file")MultipartFile file){
         ComprovanteResponse response = service.upload(solicitacaoId, file);
@@ -54,12 +54,5 @@ public class ComprovanteController {
     public ResponseEntity<List<ComprovanteResponse>> listarTodos(){
         List<ComprovanteResponse> lista = service.listarTodos();
         return ResponseEntity.ok(lista);
-    }
-
-    @PreAuthorize("hasRole('DISCENTE') and @securityUtil.isSolicitacaoOwner(#solicitacaoId)")
-    @PutMapping("/{solicitacaoId}")
-    public ResponseEntity<ComprovanteResponse> atualizar(@PathVariable Long solicitacaoId, @RequestParam("file") MultipartFile file){
-        ComprovanteResponse response = service.atualizar(solicitacaoId, file);
-        return ResponseEntity.ok(response);
     }
 }

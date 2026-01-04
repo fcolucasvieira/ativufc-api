@@ -2,80 +2,91 @@ package br.ufc.ativufc.service;
 
 import br.ufc.ativufc.dto.request.SubtipoRequest;
 import br.ufc.ativufc.dto.response.SubtipoResponse;
-import br.ufc.ativufc.exception.AlreadyExistsException;
 import br.ufc.ativufc.exception.NotFoundException;
-import br.ufc.ativufc.model.SubtipoAtividade;
+import br.ufc.ativufc.exception.OperationNotAllowedException;
+import br.ufc.ativufc.model.Atividade;
+import br.ufc.ativufc.model.Subtipo;
+import br.ufc.ativufc.repository.AtividadeRepository;
+import br.ufc.ativufc.repository.SolicitacaoRepository;
 import br.ufc.ativufc.repository.SubtipoRepository;
 import br.ufc.ativufc.utils.validation.SubtipoValidation;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 public class SubtipoService {
-    private final SubtipoRepository repository;
+    private final SubtipoRepository subtipoRepository;
+    private final AtividadeRepository atividadeRepository;
+    private final SolicitacaoRepository solicitacaoRepository;
 
-    public SubtipoService(SubtipoRepository repository) {
-        this.repository = repository;
+    public SubtipoService(SubtipoRepository subtipoRepository, AtividadeRepository atividadeRepository, SolicitacaoRepository solicitacaoRepository) {
+        this.subtipoRepository = subtipoRepository;
+        this.atividadeRepository = atividadeRepository;
+        this.solicitacaoRepository = solicitacaoRepository;
     }
 
+    @Transactional
     public SubtipoResponse cadastrar(SubtipoRequest request) {
-        SubtipoValidation.validarDescricaoUnica(repository, request.descricaoSubTipoAtividade());
+        Atividade atividade = atividadeRepository.findById(request.atividadeId())
+                        .orElseThrow(() -> new NotFoundException("Atividade não encontrada"));
 
-        SubtipoAtividade subtipo = new SubtipoAtividade(
+        SubtipoValidation.validarDescricaoUnica(subtipoRepository, request.descricao());
+        SubtipoValidation.validarHoras(request.horasMin(), request.horasMax());
+
+        Subtipo subtipo = new Subtipo(
                 null,
-                request.descricaoSubTipoAtividade(),
-                request.cargaHorariaMaxima());
+                request.descricao(),
+                request.horasMin(),
+                request.horasMax(),
+                atividade
+        );
 
-        repository.save(subtipo);
+        subtipoRepository.save(subtipo);
         return toResponse(subtipo);
     }
 
     public SubtipoResponse buscarPorId(Long id) {
-        SubtipoAtividade subtipo = repository.findById(id)
+        Subtipo subtipo = subtipoRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Subtipo não encontrado"));
         return toResponse(subtipo);
     }
 
     public List<SubtipoResponse> listarTodos() {
-        return repository.findAll().stream()
+        return subtipoRepository.findAll().stream()
                 .map(this::toResponse)
                 .toList();
     }
 
-    public SubtipoResponse atualizar(Long id, SubtipoRequest request) {
-        SubtipoAtividade subtipo = repository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Subtipo não encontrado"));
+    public List<SubtipoResponse> listarPorAtividade(Long atividadeId) {
+        Atividade atividade = atividadeRepository.findById(atividadeId)
+                .orElseThrow(() -> new NotFoundException("Atividade não encontrada"));
 
-        if (request.descricaoSubTipoAtividade() != null &&
-                !subtipo.getDescricaoSubTipoAtividade().equals(request.descricaoSubTipoAtividade())) {
-
-            SubtipoValidation.validarDescricaoUnica(repository, request.descricaoSubTipoAtividade());
-
-            subtipo.setDescricaoSubTipoAtividade(request.descricaoSubTipoAtividade());
-        }
-
-        if (request.cargaHorariaMaxima() != null) {
-            subtipo.setCargaHorariaMaxima(request.cargaHorariaMaxima());
-        }
-
-        repository.save(subtipo);
-        return toResponse(subtipo);
+        return atividade.getSubtipos().stream()
+                .map(this::toResponse)
+                .toList();
     }
 
-
+    @Transactional
     public void remover(Long id) {
-        SubtipoAtividade subtipo = repository.findById(id)
+        Subtipo subtipo = subtipoRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Subtipo não encontrado"));
 
-        repository.delete(subtipo);
+        boolean vinculoSolicitacao = solicitacaoRepository.existsBySubtipo(subtipo);
+        if(vinculoSolicitacao)
+            throw new OperationNotAllowedException("Subtipo vinculado a solicitações não pode ser removido");
+
+        subtipoRepository.delete(subtipo);
     }
 
-    public SubtipoResponse toResponse(SubtipoAtividade subtipo) {
+    private SubtipoResponse toResponse(Subtipo subtipo) {
         return new SubtipoResponse(
                 subtipo.getId(),
-                subtipo.getDescricaoSubTipoAtividade(),
-                subtipo.getCargaHorariaMaxima()
+                subtipo.getDescricao(),
+                subtipo.getHorasMin(),
+                subtipo.getHorasMax(),
+                subtipo.getAtividade().getNome()
         );
     }
 }

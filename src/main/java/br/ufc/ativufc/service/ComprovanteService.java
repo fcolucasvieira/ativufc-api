@@ -91,43 +91,6 @@ public class ComprovanteService {
                 .toList();
     }
 
-    @Transactional
-    public ComprovanteResponse atualizar(Long solicitacaoId, MultipartFile file) {
-        Solicitacao solicitacao = solicitacaoRepository.findById(solicitacaoId)
-                .orElseThrow(() -> new NotFoundException("Solicitação não encontrada"));
-
-        ComprovanteValidation.validarArquivo(file);
-
-        Comprovante comprovante = solicitacao.getComprovante();
-
-        ComprovanteValidation.validarArquivoAntigo(comprovante);
-
-        try {
-            Files.deleteIfExists(Paths.get(comprovante.getCaminho()));
-        } catch (IOException ex) {
-            throw new OperationNotAllowedException("Erro ao remover arquivo antigo");
-        }
-
-        Path destino = Paths.get(uploadDir, file.getOriginalFilename());
-        try {
-            Files.copy(file.getInputStream(), destino, StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException ex) {
-            throw new OperationNotAllowedException("Erro ao salvar arquivo");
-        }
-
-        comprovante.setCaminho(destino.toString());
-        comprovante.setNomeOriginal(file.getOriginalFilename());
-        comprovante.setContentType(file.getContentType());
-        comprovante.setTamanho(file.getSize());
-        comprovante.setUploadAt(LocalDateTime.now());
-
-        comprovanteRepository.save(comprovante);
-
-        return toResponse(comprovante);
-    }
-
-
-
     public ComprovanteResponse toResponse(Comprovante comprovante) {
         return new ComprovanteResponse(comprovante.getId(),
                 comprovante.getNomeOriginal(),

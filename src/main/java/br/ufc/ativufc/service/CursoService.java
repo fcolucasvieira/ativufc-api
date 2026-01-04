@@ -2,7 +2,6 @@ package br.ufc.ativufc.service;
 
 import br.ufc.ativufc.dto.request.CursoRequest;
 import br.ufc.ativufc.dto.response.CursoResponse;
-import br.ufc.ativufc.exception.AlreadyExistsException;
 import br.ufc.ativufc.exception.NotFoundException;
 import br.ufc.ativufc.model.Curso;
 import br.ufc.ativufc.repository.CursoRepository;
@@ -47,21 +46,6 @@ public class CursoService {
         return cursoRepository.findAll().stream()
                 .map(this::toResponse)
                 .toList();
-    }
-
-    @Transactional
-    public CursoResponse atualizar(Long id, CursoRequest request){
-        Curso curso = cursoRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Curso não encontrado"));
-
-        if (!curso.getNome().equals(request.nome()))
-            CursoValidation.validarNomeUnico(cursoRepository, request.nome());
-
-        curso.setNome(request.nome());
-        curso.setTotalHorasComplementares(request.totalHorasComplementares());
-        cursoRepository.save(curso);
-
-        return toResponse(curso);
     }
 
     @Transactional
