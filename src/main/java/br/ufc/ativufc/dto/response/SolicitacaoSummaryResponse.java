@@ -14,5 +14,9 @@ public record SolicitacaoSummaryResponse(
         Integer cargaHorariaSolicitada,
         Status status,
         LocalDate dataSolicitacao,
-        Long comprovanteId
+        Long comprovanteId,
+        LocalDate dataInicio,
+        LocalDate dataFim,
+        String observacaoDiscente,
+        String observacaoResponsavel
 ) {}

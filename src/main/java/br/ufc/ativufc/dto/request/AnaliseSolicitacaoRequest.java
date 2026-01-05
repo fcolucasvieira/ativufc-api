@@ -9,7 +9,7 @@ public record AnaliseSolicitacaoRequest(
         @NotNull
         Status status,
 
-        @Min(1)
+        @Min(0)
         Integer cargaHorariaAproveitada,
 
         @Size(max = 350)

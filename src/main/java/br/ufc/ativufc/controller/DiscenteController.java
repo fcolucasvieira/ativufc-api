@@ -36,7 +36,7 @@ public class DiscenteController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('COORDENADOR')")
     public ResponseEntity<List<DiscenteResponse>> listarTodos() {
         List<DiscenteResponse> lista = service.listarTodos();
         return ResponseEntity.ok(lista);
@@ -48,7 +48,8 @@ public class DiscenteController {
         return ResponseEntity.ok(service.atualizarPerfil(matricula, dto));
     }
 
-    @PatchMapping("/{matricula}/senha")
+    @PostMapping("/{matricula}/senha")
+    @CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.POST, RequestMethod.OPTIONS})
     @PreAuthorize("hasRole('DISCENTE') and @securityUtil.isDiscenteOwner(#matricula)")
     public ResponseEntity<Void> alterarSenha(@PathVariable String matricula, @RequestBody br.ufc.ativufc.dto.request.AlterarSenhaDTO dto) {
         service.alterarSenha(matricula, dto);

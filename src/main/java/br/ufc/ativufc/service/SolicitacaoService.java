@@ -37,7 +37,6 @@ public class SolicitacaoService {
 
     @Transactional
     public SolicitacaoDetailResponse cadastrar(SolicitacaoRequest request) {
-        // 1. Validar entidades
         Discente discente = discenteRepository.findByMatricula(request.matriculaDiscente())
                 .orElseThrow(() -> new NotFoundException("Discente não encontrado"));
 
@@ -47,7 +46,6 @@ public class SolicitacaoService {
         Instituicao instituicao = instituicaoRepository.findById(request.instituicaoId())
                 .orElseThrow(() -> new NotFoundException("Instituição não encontrada"));
 
-        // 2. Validar dados
         SolicitacaoValidation.validarDatas(request.dataInicio(), request.dataFim());
         SolicitacaoValidation.validarCargaHoraria(request.cargaHorariaSolicitada(), subtipo);
 
@@ -105,7 +103,6 @@ public class SolicitacaoService {
         Solicitacao s = solicitacaoRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Solicitação não encontrada"));
 
-        // Atualiza status e observação de responsável
         s.setStatus(request.status());
         s.setObservacaoResponsavel(request.observacaoResponsavel());
 
@@ -137,17 +134,21 @@ public class SolicitacaoService {
         solicitacaoRepository.delete(s);
     }
 
-    public SolicitacaoSummaryResponse toSummaryResponse(Solicitacao s){
+    public SolicitacaoSummaryResponse toSummaryResponse(Solicitacao s) {
         return new SolicitacaoSummaryResponse(
-        s.getId(),
-        s.getDiscente().getNome(),
-        s.getSubtipo().getAtividade().getNome(),
-        s.getSubtipo().getDescricao(),
-        s.getParticipacao(),
-        s.getCargaHorariaSolicitada(),
-        s.getStatus(),
-        s.getDataSolicitacao(),
-        s.getComprovante() != null ? s.getComprovante().getId() : null
+                s.getId(),
+                s.getDiscente().getNome(),
+                s.getSubtipo().getAtividade().getNome(),
+                s.getSubtipo().getDescricao(), // Nome do Subtipo
+                s.getParticipacao(),
+                s.getCargaHorariaSolicitada(),
+                s.getStatus(),
+                s.getDataSolicitacao(),
+                s.getComprovante() != null ? s.getComprovante().getId() : null,
+                s.getDataInicio(),
+                s.getDataFim(),
+                s.getObservacaoDiscente(),
+                s.getObservacaoResponsavel()
         );
     }
 

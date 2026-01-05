@@ -59,7 +59,7 @@ public class SolicitacaoController {
         return ResponseEntity.ok(lista);
     }
 
-    @PatchMapping("/{id}/status")
+    @PutMapping("/{id}/status")
     @PreAuthorize("hasRole('RESPONSAVEL') or hasRole('COORDENADOR')")
     public ResponseEntity<SolicitacaoDetailResponse> atualizarStatus(@PathVariable Long id, @Valid @RequestBody AnaliseSolicitacaoRequest request) {
         SolicitacaoDetailResponse response = service.atualizarStatus(id, request);
