@@ -24,8 +24,10 @@ public class SolicitacaoController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('DISCENTE') and @securityUtil.isDiscenteOwner(#request.matriculaDiscente)")
+    @PreAuthorize("hasAnyRole('COORDENADOR', 'ADMIN') or (hasRole('DISCENTE') and @securityUtil.isDiscenteOwner(#request.matriculaDiscente))")
     public ResponseEntity<SolicitacaoDetailResponse> cadastrar(@Valid @RequestBody SolicitacaoRequest request) {
+        System.out.println("Recebi pedido de cadastro!");
+        System.out.println("ID do Subtipo vindo do Front: " + request.subtipoId());
         SolicitacaoDetailResponse response = service.cadastrar(request);
         URI location = URI.create("/solicitacoes/" + response.id());
         return ResponseEntity.created(location).body(response);
