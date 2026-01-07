@@ -137,7 +137,7 @@ public class SolicitacaoService {
     public SolicitacaoSummaryResponse toSummaryResponse(Solicitacao s) {
         return new SolicitacaoSummaryResponse(
                 s.getId(),
-                s.getDiscente().getNome(),
+                s.getDiscente().getUsuario().getNome(),
                 s.getSubtipo().getAtividade().getNome(),
                 s.getSubtipo().getDescricao(), // Nome do Subtipo
                 s.getParticipacao(),
@@ -155,7 +155,7 @@ public class SolicitacaoService {
     public SolicitacaoDetailResponse toDetailResponse(Solicitacao s) {
         return new SolicitacaoDetailResponse(
                 s.getId(),
-                s.getDiscente().getNome(),
+                s.getDiscente().getUsuario().getNome(),
                 s.getDiscente().getMatricula(),
                 s.getInstituicao().getNome(),
                 s.getSubtipo().getAtividade().getNome(),

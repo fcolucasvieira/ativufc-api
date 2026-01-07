@@ -8,5 +8,6 @@ public record ResponsavelResponse(
         String instituicaoNome,
         Cargo cargo,
         String email,
+        String telefone,
         boolean ativo
 ) {}

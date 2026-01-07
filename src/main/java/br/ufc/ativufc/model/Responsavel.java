@@ -17,9 +17,6 @@ public class Responsavel {
     @Column(nullable = false, unique = true)
     private String siape;
 
-    @Column(nullable = false)
-    private String nome;
-
     @ManyToOne(optional = false)
     private Instituicao instituicao;
 

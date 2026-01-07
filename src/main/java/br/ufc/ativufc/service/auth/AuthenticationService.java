@@ -55,7 +55,7 @@ public class AuthenticationService {
                 identificador = usuario.getId();
         }
 
-        return new TokenResponse(token, usuario.getEmail(), usuario.getPerfil().name(), identificador);
+        return new TokenResponse(token, usuario.getEmail(), usuario.getPerfil().name(), usuario.getId(), identificador);
     }
 
     public String iniciarResetSenha(String email) {

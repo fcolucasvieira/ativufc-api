@@ -1,6 +1,7 @@
 package br.ufc.ativufc.service;
 
 import br.ufc.ativufc.dto.request.UsuarioRequest;
+import br.ufc.ativufc.dto.request.update.UpdateUsuarioRequest;
 import br.ufc.ativufc.dto.response.UsuarioResponse;
 import br.ufc.ativufc.exception.NotFoundException;
 import br.ufc.ativufc.model.enums.Perfil;
@@ -38,6 +39,7 @@ public class UsuarioService {
                 request.nome(),
                 request.email(),
                 passwordEncoder.encode(request.senha()),
+                request.telefone(),
                 request.perfil(),
                 true,
                 null,
@@ -71,6 +73,29 @@ public class UsuarioService {
                 .map(this::toResponse)
                 .toList();
     }
+
+    @Transactional
+    public UsuarioResponse atualizar(Long id, UpdateUsuarioRequest request) {
+        Usuario usuario = repository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
+
+        if (request.nome() != null && !request.nome().isBlank()) {
+            usuario.setNome(request.nome());
+        }
+
+        if (request.email() != null && !request.email().isBlank()) {
+            CommonValidation.validarEmailUnico(repository, request.email());
+            usuario.setEmail(request.email());
+        }
+
+        if (request.telefone() != null && !request.telefone().isBlank()) {
+            usuario.setTelefone(request.telefone());
+        }
+
+        repository.save(usuario);
+        return toResponse(usuario);
+    }
+
 
     @Transactional
     public UsuarioResponse atualizarAtivo(Long id, boolean ativo) {
@@ -107,6 +132,7 @@ public class UsuarioService {
                 usuario.getId(),
                 usuario.getNome(),
                 usuario.getEmail(),
+                usuario.getTelefone(),
                 usuario.getPerfil(),
                 usuario.isAtivo()
         );

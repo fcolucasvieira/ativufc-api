@@ -24,6 +24,19 @@ public class SecurityUtil {
         this.comprovanteRepository = comprovanteRepository;
     }
 
+    public boolean isUsuarioOwner(Long id) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated()) return false;
+
+        String token = (String) auth.getCredentials();
+        Claims claims = jwtService.parseClaims(token);
+
+        Long usuarioIdToken = claims.get("id", Long.class);
+
+        return usuarioIdToken != null && usuarioIdToken.equals(id);
+    }
+
+
     public boolean isDiscenteOwner(String matricula) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !auth.isAuthenticated()) return false;

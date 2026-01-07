@@ -19,13 +19,7 @@ public class Discente {
     private String matricula;
 
     @Column(nullable = false)
-    private String nome;
-
-    @Column(nullable = false)
     private LocalDate ingressao;
-
-    @Column
-    private String telefone;
 
     @ManyToOne(optional = false)
     private Curso curso;

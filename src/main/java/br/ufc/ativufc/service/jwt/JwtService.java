@@ -48,6 +48,7 @@ public class JwtService {
                 .setExpiration(Date.from(now.plus(loginExpiration)))
                 .claim("perfil", usuario.getPerfil().name())
                 .claim("tipo", "login")
+                .claim("id", usuario.getId())
                 .claim(getIdentificadorKey(usuario.getPerfil().name()), getIdentificadorValue(usuario))
                 .signWith(secretKey, SignatureAlgorithm.HS256)
                 .compact();

@@ -1,6 +1,7 @@
 package br.ufc.ativufc.controller;
 
 import br.ufc.ativufc.dto.request.UsuarioRequest;
+import br.ufc.ativufc.dto.request.update.UpdateUsuarioRequest;
 import br.ufc.ativufc.dto.response.UsuarioResponse;
 import br.ufc.ativufc.model.enums.Perfil;
 import br.ufc.ativufc.service.UsuarioService;
@@ -54,6 +55,16 @@ public class UsuarioController {
     public ResponseEntity<List<UsuarioResponse>> listarPorAtivo(@PathVariable boolean ativo) {
         return ResponseEntity.ok(service.listarPorAtivo(ativo));
     }
+
+    // Atualizar dados pessoais
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or @securityUtil.isUsuarioOwner(#id)")
+    public ResponseEntity<UsuarioResponse> atualizar(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateUsuarioRequest request) {
+        return ResponseEntity.ok(service.atualizar(id, request));
+    }
+
 
     @PutMapping("/{id}/ativo")
     @PreAuthorize("hasRole('ADMIN')")

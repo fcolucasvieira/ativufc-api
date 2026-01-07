@@ -4,6 +4,7 @@ public record TokenResponse(
         String token,
         String email,
         String perfil,
+        Long id,
         Object identificador
 ) {
 }

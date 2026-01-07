@@ -8,9 +8,6 @@ public record DiscenteRequest(
         @NotBlank
         String matricula,
 
-        @NotBlank
-        String nome,
-
         @PastOrPresent
         LocalDate ingressao,
 
@@ -22,10 +19,20 @@ public record DiscenteRequest(
         Integer horasCumpridas,
 
         @NotBlank
+        String nome,
+
+        @NotBlank
         @Email
         String email,
 
         @NotBlank
-        String senha
+        String senha,
+
+        @NotBlank(message = "O telefone é obrigatório")
+        @Pattern(regexp = "^(\\d{10,11}|\\(\\d{2}\\)\\s?\\d{4,5}-\\d{4})$",
+                 message = "Telefone deve ter 10 ou 11 dígitos numéricos ou estar no formato (XX) XXXXX-XXXX")
+        String telefone
+
+
 ) {
 }

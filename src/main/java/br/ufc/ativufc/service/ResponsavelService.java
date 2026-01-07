@@ -47,15 +47,16 @@ public class ResponsavelService {
                 request.nome(),
                 request.email(),
                 passwordEncoder.encode(request.senha()),
+                request.telefone(),
                 Perfil.RESPONSAVEL,
                 false, // inativo inicial (ADMIN ativa acesso)
                 null,
                 null
         );
 
+
         Responsavel responsavel = new Responsavel(
                 request.siape(),
-                request.nome(),
                 instituicao,
                 request.cargo(),
                 usuario
@@ -77,35 +78,15 @@ public class ResponsavelService {
                 .toList();
     }
 
-    public ResponsavelResponse atualizar(String siape, UpdateResponsavelRequest request){
-        Responsavel responsavel = responsavelRepository.findBySiape(siape)
-                .orElseThrow(() -> new NotFoundException("Responsável não encontrado"));
-
-        if (request.nome() != null && !request.nome().isBlank()) {
-            responsavel.setNome(request.nome());
-        }
-
-        if (request.idInstituicao() != null) {
-            Instituicao instituicao = instituicaoRepository.findById(request.idInstituicao())
-                    .orElseThrow(() -> new NotFoundException("Instituição não encontrada"));
-            responsavel.setInstituicao(instituicao);
-        }
-
-        if(request.cargo() != null){
-            responsavel.setCargo(request.cargo());
-        }
-
-        responsavelRepository.save(responsavel);
-        return toResponse(responsavel);
-    }
 
     public ResponsavelResponse toResponse(Responsavel responsavel) {
         return new ResponsavelResponse(
                 responsavel.getSiape(),
-                responsavel.getNome(),
+                responsavel.getUsuario().getNome(),
                 responsavel.getInstituicao().getNome(),
                 responsavel.getCargo(),
                 responsavel.getUsuario().getEmail(),
+                responsavel.getUsuario().getTelefone(),
                 responsavel.getUsuario().isAtivo()
         );
     }
