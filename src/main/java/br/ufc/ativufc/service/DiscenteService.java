@@ -1,6 +1,5 @@
 package br.ufc.ativufc.service;
 
-import br.ufc.ativufc.dto.request.update.UpdateDiscenteRequest;
 import br.ufc.ativufc.dto.request.DiscenteRequest;
 import br.ufc.ativufc.dto.response.DiscenteResponse;
 import br.ufc.ativufc.exception.NotFoundException;

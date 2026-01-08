@@ -1,6 +1,5 @@
 package br.ufc.ativufc.controller;
 
-import br.ufc.ativufc.dto.request.update.UpdateDiscenteRequest;
 import br.ufc.ativufc.dto.request.DiscenteRequest;
 import br.ufc.ativufc.dto.response.DiscenteResponse;
 import br.ufc.ativufc.service.DiscenteService;

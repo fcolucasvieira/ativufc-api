@@ -1,7 +1,6 @@
 package br.ufc.ativufc.controller;
 
 import br.ufc.ativufc.dto.request.ResponsavelRequest;
-import br.ufc.ativufc.dto.request.update.UpdateResponsavelRequest;
 import br.ufc.ativufc.dto.response.ResponsavelResponse;
 import br.ufc.ativufc.service.ResponsavelService;
 import jakarta.validation.Valid;

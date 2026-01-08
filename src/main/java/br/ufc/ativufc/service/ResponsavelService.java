@@ -1,7 +1,6 @@
 package br.ufc.ativufc.service;
 
 import br.ufc.ativufc.dto.request.ResponsavelRequest;
-import br.ufc.ativufc.dto.request.update.UpdateResponsavelRequest;
 import br.ufc.ativufc.dto.response.ResponsavelResponse;
 import br.ufc.ativufc.exception.NotFoundException;
 import br.ufc.ativufc.model.Instituicao;

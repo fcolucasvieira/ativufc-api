@@ -9,7 +9,7 @@ public record SubtipoRequest(
         String descricao,
 
         @NotNull
-        @Min(1)
+        @Min(0)
         Integer horasMin,
 
         @NotNull
