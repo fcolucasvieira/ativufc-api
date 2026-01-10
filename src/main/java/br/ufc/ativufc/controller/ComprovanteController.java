@@ -29,7 +29,7 @@ public class ComprovanteController {
         return ResponseEntity.ok(response);
     }
 
-    @PreAuthorize("(hasRole('DISCENTE') and @securityUtil.isComprovanteOwner(#id)) or hasRole('RESPONSAVEL')or hasRole('COORDENADOR')")
+    @PreAuthorize("(hasRole('DISCENTE') and @securityUtil.isComprovanteOwner(#id)) or hasRole('RESPONSAVEL')")
     @GetMapping("/{id}/download")
     public ResponseEntity<Resource> download(@PathVariable Long id) {
         ComprovanteResponse response = service.buscarPorId(id);

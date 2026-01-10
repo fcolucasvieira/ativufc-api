@@ -35,7 +35,7 @@ public class DiscenteController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN') or hasRole('COORDENADOR')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<DiscenteResponse>> listarTodos() {
         List<DiscenteResponse> lista = service.listarTodos();
         return ResponseEntity.ok(lista);

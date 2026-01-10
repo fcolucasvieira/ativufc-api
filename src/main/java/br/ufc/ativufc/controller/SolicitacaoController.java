@@ -24,7 +24,7 @@ public class SolicitacaoController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('COORDENADOR', 'ADMIN') or (hasRole('DISCENTE') and @securityUtil.isDiscenteOwner(#request.matriculaDiscente))")
+    @PreAuthorize("hasAnyRole('RESPONSAVEL, ADMIN') or (hasRole('DISCENTE') and @securityUtil.isDiscenteOwner(#request.matriculaDiscente))")
     public ResponseEntity<SolicitacaoDetailResponse> cadastrar(@Valid @RequestBody SolicitacaoRequest request) {
         System.out.println("Recebi pedido de cadastro!");
         System.out.println("ID do Subtipo vindo do Front: " + request.subtipoId());
@@ -34,35 +34,35 @@ public class SolicitacaoController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("(hasRole('DISCENTE') and @securityUtil.isSolicitacaoOwner(#id)) or hasRole('RESPONSAVEL') or hasRole('ADMIN') or hasRole('COORDENADOR')")
+    @PreAuthorize("(hasRole('DISCENTE') and @securityUtil.isSolicitacaoOwner(#id)) or hasRole('RESPONSAVEL') or hasRole('ADMIN')")
     public ResponseEntity<SolicitacaoDetailResponse> buscarPorId(@PathVariable Long id) {
         SolicitacaoDetailResponse response = service.buscarPorId(id);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('RESPONSAVEL') or hasRole('ADMIN') or hasRole('COORDENADOR')")
+    @PreAuthorize("hasRole('RESPONSAVEL') or hasRole('ADMIN')")
     public ResponseEntity<List<SolicitacaoSummaryResponse>> listarTodos() {
         List<SolicitacaoSummaryResponse> lista = service.listarTodos();
         return ResponseEntity.ok(lista);
     }
 
     @GetMapping("/discente/{matricula}")
-    @PreAuthorize("(hasRole('DISCENTE') and @securityUtil.isDiscenteOwner(#matricula)) or hasRole('RESPONSAVEL') or hasRole('ADMIN') or hasRole('COORDENADOR')")
+    @PreAuthorize("(hasRole('DISCENTE') and @securityUtil.isDiscenteOwner(#matricula)) or hasRole('RESPONSAVEL') or hasRole('ADMIN')")
     public ResponseEntity<List<SolicitacaoSummaryResponse>> listarPorMatricula(@PathVariable String matricula) {
         List<SolicitacaoSummaryResponse> lista = service.listarPorMatricula(matricula);
         return ResponseEntity.ok(lista);
     }
 
     @GetMapping("/status")
-    @PreAuthorize("hasRole('RESPONSAVEL') or hasRole('ADMIN') or hasRole('COORDENADOR')")
+    @PreAuthorize("hasRole('RESPONSAVEL') or hasRole('ADMIN')")
     public ResponseEntity<List<SolicitacaoSummaryResponse>> listarPorStatus(@RequestParam Status status) {
         List<SolicitacaoSummaryResponse> lista = service.listarPorStatus(status);
         return ResponseEntity.ok(lista);
     }
 
     @PutMapping("/{id}/status")
-    @PreAuthorize("hasRole('RESPONSAVEL') or hasRole('COORDENADOR')")
+    @PreAuthorize("hasRole('RESPONSAVEL')")
     public ResponseEntity<SolicitacaoDetailResponse> atualizarStatus(@PathVariable Long id, @Valid @RequestBody AnaliseSolicitacaoRequest request) {
         SolicitacaoDetailResponse response = service.atualizarStatus(id, request);
         return ResponseEntity.ok(response);

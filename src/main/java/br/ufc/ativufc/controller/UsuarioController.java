@@ -56,7 +56,7 @@ public class UsuarioController {
         return ResponseEntity.ok(service.listarPorAtivo(ativo));
     }
 
-    // Atualizar dados pessoais
+    // PUT para dados pessoais
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or @securityUtil.isUsuarioOwner(#id)")
     public ResponseEntity<UsuarioResponse> atualizar(

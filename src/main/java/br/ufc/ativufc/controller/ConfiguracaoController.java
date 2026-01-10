@@ -23,13 +23,13 @@ public class ConfiguracaoController {
     );
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN') or hasRole('COORDENADOR')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ConfiguracaoDTO> buscarConfiguracao() {
         return ResponseEntity.ok(configAtual);
     }
 
     @PutMapping
-    @PreAuthorize("hasRole('ADMIN') or hasRole('COORDENADOR')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> atualizarConfiguracao(@RequestBody ConfiguracaoDTO novaConfig) {
         configAtual = novaConfig;
 
