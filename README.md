@@ -19,15 +19,16 @@ Mais que um projeto acadêmico, é um avanço na experiência universitária e n
 - **Spring Security (JWT)**
 - **Flyway** (versionamento do banco)
 - **PostgreSQL**
-- **Swagger/OpenAPI**
+- **Swagger/OpenAPI** (em implementação)
+- **Maven** 
 
 ---
 
 ## ⚙️ Instalação e Configuração
 
-###  Pré-requisitos
+###  📋 Pré-requisitos
 - Java SDK 21+
-- PostgreSQL (instalado e rodando)
+- PostgreSQL (instalado e em execução)
 - IDE de sua preferência (IntelliJ, Eclipse, VS Code)
 
 ### 📦 Como executar o projeto
@@ -40,7 +41,7 @@ Mais que um projeto acadêmico, é um avanço na experiência universitária e n
    CREATE DATABASE ativufc;
    ```
 3. Configure o `application.properties`:
-    ```bash
+    ```java
    spring.datasource.password=<sua_senha_postgres>
    ```
 4. Crie o diretório para uploads:
@@ -50,20 +51,19 @@ Mais que um projeto acadêmico, é um avanço na experiência universitária e n
         └── comprovantes/
     ```
 5. Execute a classe `AtivufcApplication.java` na sua IDE.
-* O Flyway irá criar as tabelas e usuários iniciais automaticamente.
+* O **Flyway** irá criar as tabelas e usuários iniciais automaticamente.
 
-## 🔑 Autenticação
+## 🔐 Autenticação e Segurança
 
-A segurança da API é garantida com **JWT (JSON Web Token)**.  
+A API utiliza **JWT (JSON Web Token)** para autenticação e controle de acesso.  
 Após o login, o token deve ser enviado em todas as requisições protegidas no _**header**_:
-
 ```bash
 Authorization: Bearer <seu_token>
 ```
 
 ---
 
-### 🔐 Login
+### 🔑 Login
 **Endpoint:** `POST /auth/login`
 - **Request:**
 ```json
@@ -128,34 +128,74 @@ O processo ocorre em duas etapas: **request** e **confirm**.
 
 --- 
 
+## 👥 Perfis de Usuário
+
+A AtivUFC API adota **controle de acesso baseado em papéis (RBAC)**, garantindo que cada usuário tenha acesso apenas às funcionalidades compatíveis com sua função no sistema.
+
+### 🎓 Discente
+Responsável por registrar suas atividades complementares.
+- Criar solicitações de horas
+- Enviar comprovantes
+- Acompanhar o status das solicitações
+
+### 🧑‍🏫 Responsável
+Responsável pela validação acadêmica das atividades.
+- Visualizar solicitações pendentes
+- Analisar comprovantes
+- Aprovar ou rejeitar solicitações
+
+### 🛠️ Administrador
+Usuário com acesso completo ao sistema.
+- Gerenciar usuários e permissões
+- Manter tabelas auxiliares (cursos, instituições, atividades e subtipos)
+- Acessar todos os dados da aplicação
+
+---
+
 ## 🔗 Endpoints Principais
 
+### 📄 Solicitações
 | Método | Rota                               | Descrição             | Perfil Autorizado |
 |--------|------------------------------------|-----------------------|-------------------|
 | POST   | /solicitacoes                      | Cadastrar solicitação | Discente          |
 | PUT    | /solicitacoes/{id}/status          | Atualizar status      | Responsável       |
 | GET    | /solicitacoes/discente/{matricula} | Listar por matrícula  | Discente, Responsável, Admin |
-| POST   | /comprovantes/{solicitacaoId}      | Upload comprovante    | Discente          |
+
+### 📎 Comprovantes
+| Método | Rota                               | Descrição             | Perfil Autorizado |
+|--------|------------------------------------|-----------------------|-------------------|
+| POST   | /comprovantes/{solicitacaoId}      | Upload de comprovante | Discente          |
+| GET    | /comprovantes/{id}/download        | Download de comprovante | Discente, Responsável |
 
 ---
 
-## 👥 Perfis de Usuário
-- **Discente:** cria solicitações e envia comprovantes.
-- **Responsável:** valida solicitações e altera status.
-- **Admin:** acesso total e gestão de tabelas auxiliares (cursos, instituições, atividades, subtipos).
+## 📘 Regulamento de Horas Complementares
 
---- 
-## 📖 Documentação
+A AtivUFC API é uma ferramenta de apoio e **não substitui a validação oficial das horas acadêmicas**.  
 
-A documentação completa dos endpoints será disponibilizada futuramente via **Swagger/OpenAPI**.  
+- Os **subtipos** de atividades seguem os limites e definições do regulamento do curso de **Engenharia da Computação da UFC**.  
+- Os grupos de **atividades** não têm limites aplicados, já que cada curso possui regras próprias e aplicar limites automaticamente poderia ser imprudente.  
+
+O sistema funciona **apenas como orientação**, enquanto a validação final das horas cabe à coordenação do curso.
+
+---
+
+## 📁 Documentação
+
+A documentação completa dos endpoints será disponibilizada futuramente via **Swagger/OpenAPI**.
 Assim que estiver pronta, poderá ser acessada em:
-
 > ⚠️ Em breve: esta seção será atualizada com detalhes e instruções de uso direto pelo Swagger.
 
+---
+
 ## 🚀 Roadmap
-- [ ] Implementar documentação Swagger/OpenAPI
+- [ ] Implementar Swagger/OpenAPI
 - [ ] Adicionar testes automatizados
 - [ ] Configurar Docker para deploy simplificado
 
+---
+
 ## 👨‍💻 Autores
-Desenvolvido por [@fcolucasvieira](https://github.com/fcolucasvieira) com colaboração de [@brnz4n](https://github.com/brnz4n).
+- [Lucas Vieira](https://github.com/fcolucasvieira) – Desenvolvedor principal
+- [Breno Magalhães](https://github.com/brnz4n) – Colaborador
+
