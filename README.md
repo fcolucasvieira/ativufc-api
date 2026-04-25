@@ -5,7 +5,8 @@
 ![PostgreSQL](https://img.shields.io/badge/postgresql-database-blue?style=for-the-badge&logo=postgresql)
 ![JWT](https://img.shields.io/badge/JWT-security-black?style=for-the-badge&logo=jsonwebtokens)
 
-Uma API para simplificar e modernizar a <b>gestão de horas complementares</b> na UFC.<br>
+
+Uma API para <b>simplificar e modernizar a gestão de horas complementares</b> na UFC.<br>
 Segura, automatizada e transparente, conecta discentes, responsáveis e administradores em um único fluxo.<br>
 Mais que um projeto acadêmico, é um avanço na experiência universitária e na valorização das atividades extracurriculares 🎓🚀
 
@@ -13,13 +14,13 @@ Mais que um projeto acadêmico, é um avanço na experiência universitária e n
 
 ## 👨‍💻 Tecnologias Utilizadas
 
-- **Java 21**
-- **Spring Boot**
-- **Spring Security (JWT)**
-- **Flyway** (versionamento do banco)
-- **PostgreSQL**
-- **Swagger/OpenAPI** (em implementação)
-- **Maven** 
+- Java 21
+- Spring Boot
+- Spring Security (JWT)
+- Flyway (versionamento do banco)
+- PostgreSQL
+- Swagger/OpenAPI (em implementação)
+- Maven 
 
 ---
 
@@ -67,7 +68,7 @@ Authorization: Bearer <seu_token>
 - **Request:**
 ```json
 {
-  "email": "lucas.vieira@alu.ufc.br",
+  "email": "joao.silva@alu.ufc.br",
   "senha": "Senha@123"
 }
 ```
@@ -75,10 +76,10 @@ Authorization: Bearer <seu_token>
 ```json
 {
   "token": "eyJhbGciOiJIUzI1NiJ9...",
-  "email": "lucas.vieira@alu.ufc.br",
+  "email": "joao.silva@alu.ufc.br",
   "perfil": "DISCENTE",
   "id": 1,
-  "identificador": "563655"
+  "identificador": "123456"
 }
 ```
 --- 
