@@ -1,10 +1,9 @@
 <h1 align="center">🎓 AtivUFC API</h1>
 
-![Status](https://img.shields.io/badge/status-concluído-brightgreen)
-![Backend](https://img.shields.io/badge/backend-Spring%20Boot-blue)
-![Database](https://img.shields.io/badge/database-PostgreSQL-blueviolet)
-![Security](https://img.shields.io/badge/security-JWT-yellow)
-![Build](https://img.shields.io/badge/build-Maven-brown)
+![Java](https://img.shields.io/badge/java-21-red?style=for-the-badge&logo=openjdk)
+![Spring Boot](https://img.shields.io/badge/spring_boot-brightgreen?style=for-the-badge&logo=springboot)
+![PostgreSQL](https://img.shields.io/badge/postgresql-database-blue?style=for-the-badge&logo=postgresql)
+![JWT](https://img.shields.io/badge/JWT-security-black?style=for-the-badge&logo=jsonwebtokens)
 
 Uma API para simplificar e modernizar a <b>gestão de horas complementares</b> na UFC.<br>
 Segura, automatizada e transparente, conecta discentes, responsáveis e administradores em um único fluxo.<br>
